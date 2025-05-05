@@ -71,6 +71,8 @@ const translations: Record<Language, Record<string, string>> = {
     "services.button.more": "Детальніше",
     "services.button.all": "Всі послуги",
     "services.our": "Наші послуги",
+    "services.features": "Функції",
+    "services.benefits": "Переваги",
 
     // Service Names
     "service.infosec": "Інформаційна безпека",
@@ -259,6 +261,8 @@ const translations: Record<Language, Record<string, string>> = {
     "services.button.more": "Learn More",
     "services.button.all": "All Services",
     "services.our": "Our Services",
+    "services.features": "Features",
+    "services.benefits": "Benefits",
 
     // Service Names
     "service.infosec": "Information Security",
@@ -450,6 +454,8 @@ const translations: Record<Language, Record<string, string>> = {
     "services.button.more": "Więcej informacji",
     "services.button.all": "Wszystkie usługi",
     "services.our": "Nasze usługi",
+    "services.features": "Funkcje",
+    "services.benefits": "Korzyści",
 
     // Service Names
     "service.infosec": "Bezpieczeństwo informacji",
@@ -641,6 +647,8 @@ const translations: Record<Language, Record<string, string>> = {
     "services.button.more": "Mehr erfahren",
     "services.button.all": "Alle Dienstleistungen",
     "services.our": "Unsere Dienstleistungen",
+    "services.features": "Funktionen",
+    "services.benefits": "Vorteile",
 
     // Service Names
     "service.infosec": "Informationssicherheit",
