@@ -19,7 +19,7 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.8 }}
       >
-        {t("hero.title")}
+        Investing in security today is preventing losses tomorrow.
       </motion.h1>
       <motion.p
         className="mt-6 text-lg text-gray-600 max-w-xl"

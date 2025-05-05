@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { useState } from "react"
 import { ChevronDown } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
 
 interface ProjectSection {
   title: string
@@ -24,6 +25,7 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project, index }: ProjectCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const { t } = useLanguage()
 
   return (
     <motion.div
