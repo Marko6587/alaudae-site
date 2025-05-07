@@ -224,7 +224,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="flex justify-center mb-16"
             >
-              <Image src="/logo.png" alt="Alaudae Secure Consulting" width={120} height={120} className="h-auto" />
+              <Image src="/logo.png" alt="Alaudae Secure Consulting" width={270} height={270} className="h-auto" />
             </motion.div>
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-tight mb-8">
