@@ -1,31 +1,27 @@
-import type React from "react"
-import type { Metadata } from "next/dist/lib/metadata/types/metadata-interface"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
 import { LanguageProvider } from "@/context/language-context"
+import "./globals.css"
+import { Inter } from "next/font/google"
+import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 
-const inter = Inter({ subsets: ["latin", "cyrillic", "cyrillic-ext"] })
+const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
-  title: "Alaudae - Security Solutions",
-  description: "Investing in security today is preventing losses tomorrow.",
+export const metadata = {
+  title: "Alaudae",
+  description: "Alaudae - Business Intelligence & Security",
     generator: 'v0.dev'
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
         <LanguageProvider>
-          <Navbar />
-          {children}
-          <Footer />
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </div>
         </LanguageProvider>
       </body>
     </html>

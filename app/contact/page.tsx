@@ -1,176 +1,247 @@
 "use client"
-
-import type React from "react"
-
-import { motion } from "framer-motion"
 import { useState } from "react"
 import { useLanguage } from "@/context/language-context"
+import { motion } from "framer-motion"
+import { ArrowRight, CheckCircle } from "lucide-react"
 
 export default function Contact() {
-  const { t } = useLanguage()
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  })
+  const { language } = useLanguage()
+  const [formSubmitted, setFormSubmitted] = useState(false)
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<null | "success" | "error">(null)
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    // Simulate form submission
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      setSubmitStatus("success")
-      setFormData({ name: "", email: "", subject: "", message: "" })
-    } catch (error) {
-      setSubmitStatus("error")
-    } finally {
-      setIsSubmitting(false)
-      // Reset status after 5 seconds
-      setTimeout(() => setSubmitStatus(null), 5000)
+  const getContactContent = () => {
+    switch (language) {
+      case "uk":
+        return {
+          title: "Зв'яжіться з нами",
+          description: "Маєте питання або готові почати проект? Зв'яжіться з нами будь-яким зручним способом.",
+          form: {
+            name: "Ім'я",
+            email: "Електронна пошта",
+            subject: "Тема",
+            message: "Повідомлення",
+            submit: "Надіслати",
+            success: "Дякуємо за ваше повідомлення! Ми зв'яжемося з вами найближчим часом.",
+          },
+          contact: {
+            title: "Контактна інформація",
+            address: "Адреса",
+            addressLine: "вул. Бізнес-центр, 123, Київ, Україна",
+            phone: "Телефон",
+            email: "Електронна пошта",
+          },
+        }
+      case "en":
+        return {
+          title: "Contact Us",
+          description: "Have questions or ready to start a project? Contact us in any convenient way.",
+          form: {
+            name: "Name",
+            email: "Email",
+            subject: "Subject",
+            message: "Message",
+            submit: "Submit",
+            success: "Thank you for your message! We will contact you soon.",
+          },
+          contact: {
+            title: "Contact Information",
+            address: "Address",
+            addressLine: "Business Center St., 123, Kyiv, Ukraine",
+            phone: "Phone",
+            email: "Email",
+          },
+        }
+      case "pl":
+        return {
+          title: "Skontaktuj się z nami",
+          description:
+            "Masz pytania lub jesteś gotowy rozpocząć projekt? Skontaktuj się z nami w dowolny wygodny sposób.",
+          form: {
+            name: "Imię",
+            email: "E-mail",
+            subject: "Temat",
+            message: "Wiadomość",
+            submit: "Wyślij",
+            success: "Dziękujemy za Twoją wiadomość! Skontaktujemy się z Tobą wkrótce.",
+          },
+          contact: {
+            title: "Informacje kontaktowe",
+            address: "Adres",
+            addressLine: "ul. Centrum Biznesowe, 123, Kijów, Ukraina",
+            phone: "Telefon",
+            email: "E-mail",
+          },
+        }
+      case "de":
+        return {
+          title: "Kontaktieren Sie uns",
+          description:
+            "Haben Sie Fragen oder sind Sie bereit, ein Projekt zu starten? Kontaktieren Sie uns auf jede bequeme Weise.",
+          form: {
+            name: "Name",
+            email: "E-Mail",
+            subject: "Betreff",
+            message: "Nachricht",
+            submit: "Absenden",
+            success: "Vielen Dank für Ihre Nachricht! Wir werden uns in Kürze mit Ihnen in Verbindung setzen.",
+          },
+          contact: {
+            title: "Kontaktinformationen",
+            address: "Adresse",
+            addressLine: "Geschäftszentrum Str., 123, Kiew, Ukraine",
+            phone: "Telefon",
+            email: "E-Mail",
+          },
+        }
+      default:
+        return {
+          title: "Свяжитесь с нами",
+          description: "Есть вопросы или готовы начать проект? Свяжитесь с нами любым удобным способом.",
+          form: {
+            name: "Имя",
+            email: "Электронная почта",
+            subject: "Тема",
+            message: "Сообщение",
+            submit: "Отправить",
+            success: "Спасибо за ваше сообщение! Мы свяжемся с вами в ближайшее время.",
+          },
+          contact: {
+            title: "Контактная информация",
+            address: "Адрес",
+            addressLine: "ул. Бизнес-центр, 123, Киев, Украина",
+            phone: "Телефон",
+            email: "Электронная почта",
+          },
+        }
     }
   }
 
+  const content = getContactContent()
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    // Here you would normally handle the form submission
+    setFormSubmitted(true)
+  }
+
   return (
-    <main className="min-h-screen py-24 px-6 md:px-16 lg:px-32">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="max-w-4xl mx-auto"
-      >
-        <h1 className="text-4xl font-bold mb-8 text-center">{t("contact.title")}</h1>
+    <div className="bg-white min-h-screen py-24">
+      <div className="container mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-20"
+        >
+          <h1 className="text-3xl font-light mb-4">{content.title}</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">{content.description}</p>
+        </motion.div>
 
-        <div className="flex flex-col md:flex-row gap-12">
-          <div className="md:w-1/2">
-            <h2 className="text-2xl font-semibold mb-4">{t("contact.info.title")}</h2>
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              {formSubmitted ? (
+                <div className="text-center py-12">
+                  <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-6" />
+                  <p className="text-xl font-light mb-2">{content.form.success}</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm text-gray-500 mb-1 font-light">
+                      {content.form.name}
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      required
+                      className="w-full px-4 py-2 border-b border-gray-200 focus:outline-none focus:border-gray-400 transition-all duration-200 bg-transparent font-light"
+                    />
+                  </div>
 
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-2">{t("contact.address.title")}</h3>
-                <p className="text-gray-700 whitespace-pre-line">Gdansk, Kolorowa 25, 80-180</p>
-              </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm text-gray-500 mb-1 font-light">
+                      {content.form.email}
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      className="w-full px-4 py-2 border-b border-gray-200 focus:outline-none focus:border-gray-400 transition-all duration-200 bg-transparent font-light"
+                    />
+                  </div>
 
-              <div>
-                <h3 className="text-lg font-medium mb-2">{t("contact.phone.title")}</h3>
-                <p className="text-gray-700">+ 48 500 540 421</p>
-              </div>
+                  <div>
+                    <label htmlFor="subject" className="block text-sm text-gray-500 mb-1 font-light">
+                      {content.form.subject}
+                    </label>
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      required
+                      className="w-full px-4 py-2 border-b border-gray-200 focus:outline-none focus:border-gray-400 transition-all duration-200 bg-transparent font-light"
+                    />
+                  </div>
 
-              <div>
-                <h3 className="text-lg font-medium mb-2">{t("contact.email.title")}</h3>
-                <p className="text-gray-700">info@alaudae.com</p>
-              </div>
+                  <div>
+                    <label htmlFor="message" className="block text-sm text-gray-500 mb-1 font-light">
+                      {content.form.message}
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={5}
+                      required
+                      className="w-full px-4 py-2 border-b border-gray-200 focus:outline-none focus:border-gray-400 transition-all duration-200 bg-transparent font-light"
+                    ></textarea>
+                  </div>
 
-              <div>
-                <h3 className="text-lg font-medium mb-2">{t("contact.hours.title")}</h3>
-                <p className="text-gray-700 whitespace-pre-line">{t("contact.hours.text")}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="md:w-1/2">
-            <h2 className="text-2xl font-semibold mb-4">{t("contact.form.title")}</h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t("contact.form.name")}
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t("contact.form.email")}
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t("contact.form.subject")}
-                </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                >
-                  <option value="">{t("contact.form.subject.select")}</option>
-                  <option value="Информационная безопасность">{t("service.infosec")}</option>
-                  <option value="Loss Prevention">{t("service.lossPrevention")}</option>
-                  <option value="Compliance">{t("service.compliance")}</option>
-                  <option value="Audyt">{t("service.audit")}</option>
-                  <option value="Lean Management">{t("service.leanManagement")}</option>
-                  <option value="Risc Management">{t("service.riskManagement")}</option>
-                  <option value="Другое">{t("contact.form.subject.other")}</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t("contact.form.message")}
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                ></textarea>
-              </div>
-
-              <motion.button
-                type="submit"
-                className="px-6 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition w-full"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? t("contact.form.button.sending") : t("contact.form.button.send")}
-              </motion.button>
-
-              {submitStatus === "success" && (
-                <div className="p-3 bg-green-100 text-green-800 rounded-md">{t("contact.form.success")}</div>
+                  <div>
+                    <button
+                      type="submit"
+                      className="group bg-white hover:bg-gray-50 text-black border border-gray-200 font-light py-3 px-8 transition duration-300 flex items-center"
+                    >
+                      {content.form.submit}
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </button>
+                  </div>
+                </form>
               )}
+            </motion.div>
 
-              {submitStatus === "error" && (
-                <div className="p-3 bg-red-100 text-red-800 rounded-md">{t("contact.form.error")}</div>
-              )}
-            </form>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <h2 className="text-xl font-light mb-8">{content.contact.title}</h2>
+
+              <div className="space-y-6">
+                <div>
+                  <p className="text-sm text-gray-400 mb-1 font-light">{content.contact.address}</p>
+                  <p className="text-gray-600 font-light">{content.contact.addressLine}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-400 mb-1 font-light">{content.contact.phone}</p>
+                  <p className="text-gray-600 font-light">+380 44 123 4567</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-400 mb-1 font-light">{content.contact.email}</p>
+                  <p className="text-gray-600 font-light">info@alaudae.com</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </motion.div>
-    </main>
+      </div>
+    </div>
   )
 }
