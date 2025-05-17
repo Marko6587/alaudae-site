@@ -847,58 +847,6 @@ export default function Projects() {
           {
             title:
               language === "uk"
-                ? "🔍 Історія Фрументаріїв"
-                : language === "en"
-                  ? "🔍 History of Frumentarii"
-                  : language === "pl"
-                    ? "🔍 Historia Frumentarii"
-                    : language === "de"
-                      ? "🔍 Geschichte der Frumentarii"
-                      : "🔍 История Фрументариев",
-            content:
-              language === "uk"
-                ? [
-                    "Фрументарії (лат. frumentarii) — спеціальна служба Римської імперії, створена в I столітті н.е.",
-                    "Спочатку вони відповідали за постачання зерна (frumentum) для легіонів.",
-                    "Поступово їх функції розширилися до збору розвідувальної інформації, контррозвідки та спеціальних операцій.",
-                    "Фрументарії діяли під прикриттям, мали розгалужену мережу інформаторів та були підпорядковані безпосередньо імператору.",
-                    "Їх методи роботи стали основою для багатьох сучасних спецслужб.",
-                  ]
-                : language === "en"
-                  ? [
-                      "Frumentarii (Latin: frumentarii) — a special service of the Roman Empire, created in the 1st century AD.",
-                      "Initially, they were responsible for supplying grain (frumentum) to the legions.",
-                      "Gradually, their functions expanded to include intelligence gathering, counterintelligence, and special operations.",
-                      "Frumentarii operated undercover, had an extensive network of informants, and reported directly to the emperor.",
-                      "Their working methods became the foundation for many modern intelligence services.",
-                    ]
-                  : language === "pl"
-                    ? [
-                        "Frumentarii (łac. frumentarii) — specjalna służba Imperium Rzymskiego, utworzona w I wieku n.e.",
-                        "Początkowo byli odpowiedzialni za dostarczanie zboża (frumentum) dla legionów.",
-                        "Stopniowo ich funkcje rozszerzyły się o zbieranie informacji wywiadowczych, kontrwywiad i operacje specjalne.",
-                        "Frumentarii działali pod przykrywką, mieli rozległą sieć informatorów i podlegali bezpośrednio cesarzowi.",
-                        "Ich metody pracy stały się podstawą dla wielu współczesnych służb wywiadowczych.",
-                      ]
-                    : language === "de"
-                      ? [
-                          "Frumentarii (Latein: frumentarii) — ein spezieller Dienst des Römischen Reiches, gegründet im 1. Jahrhundert n. Chr.",
-                          "Ursprünglich waren sie für die Getreideversorgung (frumentum) der Legionen verantwortlich.",
-                          "Allmählich erweiterten sich ihre Funktionen auf Informationsbeschaffung, Spionageabwehr und Sonderoperationen.",
-                          "Frumentarii arbeiteten verdeckt, verfügten über ein umfangreiches Netzwerk von Informanten und berichteten direkt an den Kaiser.",
-                          "Ihre Arbeitsmethoden wurden zur Grundlage für viele moderne Nachrichtendienste.",
-                        ]
-                      : [
-                          "Фрументарии (лат. frumentarii) — специальная служба Римской империи, созданная в I веке н.э.",
-                          "Изначально они отвечали за поставку зерна (frumentum) для легионов.",
-                          "Постепенно их функции расширились до сбора разведывательной информации, контрразведки и специальных операций.",
-                          "Фрументарии действовали под прикрытием, имели разветвленную сеть информаторов и подчинялись непосредственно императору.",
-                          "Их методы работы стали основой для многих современных спецслужб.",
-                        ],
-          },
-          {
-            title:
-              language === "uk"
                 ? "🚀 Як починається проект?"
                 : language === "en"
                   ? "🚀 How does the project start?"
@@ -994,7 +942,7 @@ export default function Projects() {
                       : [
                           "Средний и крупный бизнес с устаревшими или дублирующими процессами",
                           "Компании на этапе цифровой трансформации",
-                          "Организации с высокой долей ручного труда, Excel-отчетности, неинтегрированных систем",
+                          "Организации с высокой долей ручного труда, Excel-отчетности, неинтегрованых систем",
                           "Руководители, уставшие от «костылей» в управлении",
                         ],
           },
@@ -1012,7 +960,7 @@ export default function Projects() {
             content:
               language === "uk"
                 ? [
-                    "Process Optimization & Automation System (POAS) — это цифрова екосистема, що дозволяє:",
+                    "Process Optimization & Automation System (POAS) — це цифрова екосистема, що дозволяє:",
                     "Виявити та усунути неефективності в процесах",
                     "Стандартизувати та регламентувати ключові операції",
                     "Автоматизувати рутину та підвищити прозорість управління",

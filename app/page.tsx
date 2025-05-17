@@ -33,11 +33,11 @@ export default function Home() {
                 description: "Забезпечення відповідності бізнес-процесів та систем нормативним вимогам",
               },
               {
-                title: "Risc Menagment",
+                title: "Risc Management",
                 description: "Ідентифікація, оцінка та управління ризиками для мінімізації їх впливу на бізнес",
               },
               {
-                title: "Lean Menagment",
+                title: "Lean Management",
                 description: "Оптимізація бізнес-процесів для підвищення ефективності та зниження витрат",
               },
             ],
@@ -70,11 +70,11 @@ export default function Home() {
                 description: "Ensure business processes and systems comply with regulatory requirements",
               },
               {
-                title: "Risc Menagment",
+                title: "Risc Management",
                 description: "Identify, assess, and manage risks to minimize their impact on business",
               },
               {
-                title: "Lean Menagment",
+                title: "Lean Management",
                 description: "Optimize business processes to increase efficiency and reduce costs",
               },
             ],
@@ -107,12 +107,12 @@ export default function Home() {
                 description: "Zapewnienie zgodności procesów biznesowych i systemów z wymogami regulacyjnymi",
               },
               {
-                title: "Risc Menagment",
+                title: "Risc Management",
                 description:
                   "Identyfikacja, ocena i zarządzanie ryzykiem w celu zminimalizowania jego wpływu na biznes",
               },
               {
-                title: "Lean Menagment",
+                title: "Lean Management",
                 description: "Optymalizacja procesów biznesowych w celu zwiększenia wydajności i redukcji kosztów",
               },
             ],
@@ -147,12 +147,12 @@ export default function Home() {
                   "Sicherstellung der Einhaltung von Geschäftsprozessen und Systemen mit regulatorischen Anforderungen",
               },
               {
-                title: "Risc Menagment",
+                title: "Risc Management",
                 description:
                   "Identifizierung, Bewertung und Management von Risiken zur Minimierung ihrer Auswirkungen auf das Geschäft",
               },
               {
-                title: "Lean Menagment",
+                title: "Lean Management",
                 description: "Optimierung von Geschäftsprozessen zur Steigerung der Effizienz und Senkung der Kosten",
               },
             ],
@@ -186,11 +186,11 @@ export default function Home() {
                 description: "Обеспечение соответствия бизнес-процессов и систем нормативным требованиям",
               },
               {
-                title: "Risc Menagment",
+                title: "Risc Management",
                 description: "Идентификация, оценка и управление рисками для минимизации их влияния на бизнес",
               },
               {
-                title: "Lean Menagment",
+                title: "Lean Management",
                 description: "Оптимизация бизнес-процессов для повышения эффективности и снижения затрат",
               },
             ],

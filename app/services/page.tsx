@@ -68,8 +68,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-menagment",
-              title: "Risc Menagment",
+              id: "risc-management",
+              title: "Risc Management",
               description: "Ідентифікація, оцінка та управління ризиками для мінімізації їх впливу на бізнес.",
               features: [
                 "Ідентифікація ризиків",
@@ -85,8 +85,8 @@ export default function Services() {
               ],
             },
             {
-              id: "lean-menagment",
-              title: "Lean Menagment",
+              id: "lean-management",
+              title: "Lean Management",
               description: "Оптимізація бізнес-процесів для підвищення ефективності та зниження витрат.",
               features: [
                 "Аналіз поточних процесів",
@@ -160,8 +160,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-menagment",
-              title: "Risc Menagment",
+              id: "risc-management",
+              title: "Risc Management",
               description: "Identify, assess, and manage risks to minimize their impact on business.",
               features: [
                 "Risk identification",
@@ -177,8 +177,8 @@ export default function Services() {
               ],
             },
             {
-              id: "lean-menagment",
-              title: "Lean Menagment",
+              id: "lean-management",
+              title: "Lean Management",
               description: "Optimize business processes to increase efficiency and reduce costs.",
               features: [
                 "Current process analysis",
@@ -255,8 +255,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-menagment",
-              title: "Risc Menagment",
+              id: "risc-management",
+              title: "Risc Management",
               description: "Identyfikacja, ocena i zarządzanie ryzykiem w celu zminimalizowania jego wpływu na biznes.",
               features: [
                 "Identyfikacja ryzyka",
@@ -272,8 +272,8 @@ export default function Services() {
               ],
             },
             {
-              id: "lean-menagment",
-              title: "Lean Menagment",
+              id: "lean-management",
+              title: "Lean Management",
               description: "Optymalizacja procesów biznesowych w celu zwiększenia wydajności i redukcji kosztów.",
               features: [
                 "Analiza bieżących procesów",
@@ -350,8 +350,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-menagment",
-              title: "Risc Menagment",
+              id: "risc-management",
+              title: "Risc Management",
               description:
                 "Identifizierung, Bewertung und Management von Risiken zur Minimierung ihrer Auswirkungen auf das Geschäft.",
               features: [
@@ -368,8 +368,8 @@ export default function Services() {
               ],
             },
             {
-              id: "lean-menagment",
-              title: "Lean Menagment",
+              id: "lean-management",
+              title: "Lean Management",
               description: "Optimierung von Geschäftsprozessen zur Steigerung der Effizienz und Senkung der Kosten.",
               features: [
                 "Analyse aktueller Prozesse",
@@ -444,8 +444,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-menagment",
-              title: "Risc Menagment",
+              id: "risc-management",
+              title: "Risc Management",
               description: "Идентификация, оценка и управление рисками для минимизации их влияния на бизнес.",
               features: [
                 "Идентификация рисков",
@@ -461,8 +461,8 @@ export default function Services() {
               ],
             },
             {
-              id: "lean-menagment",
-              title: "Lean Menagment",
+              id: "lean-management",
+              title: "Lean Management",
               description: "Оптимизация бизнес-процессов для повышения эффективности и снижения затрат.",
               features: [
                 "Анализ текущих процессов",
