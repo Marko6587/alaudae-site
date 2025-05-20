@@ -68,8 +68,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-management",
-              title: "Risc Management",
+              id: "risk-management",
+              title: "Risk Management",
               description: "Ідентифікація, оцінка та управління ризиками для мінімізації їх впливу на бізнес.",
               features: [
                 "Ідентифікація ризиків",
@@ -160,8 +160,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-management",
-              title: "Risc Management",
+              id: "risk-management",
+              title: "Risk Management",
               description: "Identify, assess, and manage risks to minimize their impact on business.",
               features: [
                 "Risk identification",
@@ -255,8 +255,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-management",
-              title: "Risc Management",
+              id: "risk-management",
+              title: "Risk Management",
               description: "Identyfikacja, ocena i zarządzanie ryzykiem w celu zminimalizowania jego wpływu na biznes.",
               features: [
                 "Identyfikacja ryzyka",
@@ -350,8 +350,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-management",
-              title: "Risc Management",
+              id: "risk-management",
+              title: "Risk Management",
               description:
                 "Identifizierung, Bewertung und Management von Risiken zur Minimierung ihrer Auswirkungen auf das Geschäft.",
               features: [
@@ -444,8 +444,8 @@ export default function Services() {
               ],
             },
             {
-              id: "risc-management",
-              title: "Risc Management",
+              id: "risk-management",
+              title: "Risk Management",
               description: "Идентификация, оценка и управление рисками для минимизации их влияния на бизнес.",
               features: [
                 "Идентификация рисков",

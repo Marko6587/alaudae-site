@@ -3,13 +3,13 @@
 import { createContext, useContext, useState } from "react"
 
 const LanguageContext = createContext({
-  language: "uk",
+  language: "en",
   t: (key) => key,
   setLanguage: () => {},
 })
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState("uk")
+  const [language, setLanguage] = useState("en")
 
   const translations = {
     uk: {

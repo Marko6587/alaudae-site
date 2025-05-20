@@ -33,7 +33,7 @@ export default function Home() {
                 description: "Забезпечення відповідності бізнес-процесів та систем нормативним вимогам",
               },
               {
-                title: "Risc Management",
+                title: "Risk Management",
                 description: "Ідентифікація, оцінка та управління ризиками для мінімізації їх впливу на бізнес",
               },
               {
@@ -70,7 +70,7 @@ export default function Home() {
                 description: "Ensure business processes and systems comply with regulatory requirements",
               },
               {
-                title: "Risc Management",
+                title: "Risk Management",
                 description: "Identify, assess, and manage risks to minimize their impact on business",
               },
               {
@@ -107,7 +107,7 @@ export default function Home() {
                 description: "Zapewnienie zgodności procesów biznesowych i systemów z wymogami regulacyjnymi",
               },
               {
-                title: "Risc Management",
+                title: "Risk Management",
                 description:
                   "Identyfikacja, ocena i zarządzanie ryzykiem w celu zminimalizowania jego wpływu na biznes",
               },
@@ -147,7 +147,7 @@ export default function Home() {
                   "Sicherstellung der Einhaltung von Geschäftsprozessen und Systemen mit regulatorischen Anforderungen",
               },
               {
-                title: "Risc Management",
+                title: "Risk Management",
                 description:
                   "Identifizierung, Bewertung und Management von Risiken zur Minimierung ihrer Auswirkungen auf das Geschäft",
               },
@@ -186,7 +186,7 @@ export default function Home() {
                 description: "Обеспечение соответствия бизнес-процессов и систем нормативным требованиям",
               },
               {
-                title: "Risc Management",
+                title: "Risk Management",
                 description: "Идентификация, оценка и управление рисками для минимизации их влияния на бизнес",
               },
               {
