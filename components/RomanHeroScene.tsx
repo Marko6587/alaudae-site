@@ -358,14 +358,23 @@ export default function RomanHeroScene({ className = "" }: { className?: string 
       scrollTarget = THREE.MathUtils.clamp((window.innerHeight * 0.6 - rect.top) / distance, 0, 1)
     }
 
+    /**
+     * Base horizontal offset of the composition. On wide viewports the objects
+     * sit right of centre so the headline column on the left stays legible; on
+     * narrow ones they stay centred and simply shrink.
+     */
+    let layoutOffsetX = 0
+
     const onResize = () => {
       if (!mount.clientWidth || !mount.clientHeight) return
       camera.aspect = mount.clientWidth / mount.clientHeight
       camera.updateProjectionMatrix()
       renderer.setSize(mount.clientWidth, mount.clientHeight)
-      const scale = THREE.MathUtils.clamp(mount.clientWidth / 1280, 0.62, 1)
+      const width = mount.clientWidth
+      const scale = THREE.MathUtils.clamp(width / 1280, 0.52, 1)
       heroLayer.scale.setScalar(scale)
       midLayer.scale.setScalar(scale)
+      layoutOffsetX = width >= 1024 ? 2.6 : width >= 768 ? 1.6 : 0
       readScrollProgress()
     }
 
@@ -384,13 +393,13 @@ export default function RomanHeroScene({ className = "" }: { className?: string 
 
     onResize()
 
-    const clock = new THREE.Clock()
+    const start = performance.now()
 
     const render = () => {
       frame = requestAnimationFrame(render)
       if (!visible) return
 
-      const elapsed = clock.getElapsedTime()
+      const elapsed = (performance.now() - start) / 1000
 
       // Damped pointer + scroll so motion always eases in
       pointer.x = lerp(pointer.x, pointerTarget.x, reduceMotion ? 1 : 0.05)
@@ -406,14 +415,14 @@ export default function RomanHeroScene({ className = "" }: { className?: string 
       bgLayer.position.y = -pointer.y * 0.25 - p * 0.6
       bgLayer.rotation.z = pointer.x * 0.02 + elapsed * 0.005
 
-      midLayer.position.x = pointer.x * 0.9
+      midLayer.position.x = layoutOffsetX * 0.8 + pointer.x * 0.9
       midLayer.position.y = -pointer.y * 0.6 + p * 1.1
       midLayer.rotation.z = elapsed * 0.04 + p * 0.5
       rings.forEach((ring, index) => {
         ring.rotation.y = elapsed * (0.08 + index * 0.03) + p * (1 + index * 0.4)
       })
 
-      heroLayer.position.x = pointer.x * 1.5
+      heroLayer.position.x = layoutOffsetX + pointer.x * 1.5
       heroLayer.position.y = -pointer.y * 1.0
       heroLayer.rotation.y = pointer.x * 0.32
       heroLayer.rotation.x = pointer.y * 0.2

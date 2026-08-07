@@ -25,7 +25,7 @@ export default function Home() {
         {/* Keeps type legible over the rendered metal */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10 bg-white/60 md:bg-gradient-to-r md:from-white md:via-white/80 md:to-transparent"
+          className="pointer-events-none absolute inset-0 z-10 bg-white/[0.78] md:bg-gradient-to-r md:from-white md:via-white/80 md:to-transparent"
         />
 
         <div className="container relative z-20 mx-auto px-6">
@@ -78,7 +78,6 @@ export default function Home() {
                 className="group flex flex-col border-t border-gray-200 pt-6 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both"
                 style={{ animationDelay: `${index * 80}ms` }}
               >
-                <span className="mb-4 font-mono text-[10px] text-gray-400">{String(index + 1).padStart(2, "0")}</span>
                 <h3 className="mb-3 text-lg font-medium text-balance transition-colors duration-200 group-hover:text-gray-600">
                   {category.title}
                 </h3>
