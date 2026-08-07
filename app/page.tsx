@@ -1,14 +1,10 @@
 "use client"
 
-import dynamic from "next/dynamic"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { formatPostDate, getBlog, getHome, getServices } from "@/lib/content"
-
-// WebGL work stays out of the server bundle and off the critical path.
-const RomanHeroScene = dynamic(() => import("@/components/RomanHeroScene"), { ssr: false })
 
 export default function Home() {
   const { language } = useLanguage()
@@ -19,19 +15,12 @@ export default function Home() {
 
   return (
     <div className="bg-white text-black">
-      {/* Hero with interactive 3D scene */}
-      <section className="relative flex min-h-[100svh] items-start overflow-hidden pb-20 pt-[30rem] md:items-center md:pb-28 md:pt-24">
-        <RomanHeroScene className="pointer-events-none absolute inset-0 z-0" />
-        {/* On narrow screens the scene owns the upper stage; on desktop copy and object sit side by side. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-transparent via-white/10 via-[35%] to-white to-[55%] md:bg-gradient-to-r md:from-white md:via-white/75 md:to-transparent"
-        />
-
-        <div className="container relative z-20 mx-auto px-6">
-          <div className="max-w-2xl text-center md:text-left animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-            <div className="mb-10 hidden justify-center md:flex md:justify-start animate-in fade-in zoom-in-95 duration-700 delay-200 fill-mode-both">
-              <Image src="/logo.png" alt="Alaudae Secure Consulting" width={190} height={190} className="h-auto" />
+      {/* Hero */}
+      <section className="relative flex min-h-[92svh] items-center overflow-hidden py-24">
+        <div className="container relative z-10 mx-auto px-6">
+          <div className="mx-auto max-w-3xl text-center animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
+            <div className="mb-10 flex justify-center animate-in fade-in zoom-in-95 duration-700 delay-150 fill-mode-both">
+              <Image src="/logo.png" alt="Alaudae Secure Consulting" width={180} height={180} className="h-auto" priority />
             </div>
 
             <p className="mb-6 text-xs uppercase tracking-[0.25em] text-gray-500">{copy.eyebrow}</p>
@@ -39,11 +28,9 @@ export default function Home() {
               {copy.headline}
             </h1>
             <p className="mb-5 text-lg font-light text-gray-600 text-pretty">{copy.subtitle}</p>
-            <p className="mx-auto mb-12 max-w-xl text-base font-light text-gray-500 md:mx-0 text-pretty">
-              {copy.description}
-            </p>
+            <p className="mx-auto mb-12 max-w-xl text-base font-light text-gray-500 text-pretty">{copy.description}</p>
 
-            <div className="flex flex-col items-center gap-4 sm:flex-row md:items-start md:justify-start">
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/services">
                 <button className="group flex items-center border border-black bg-black px-8 py-3 font-light text-white transition-colors duration-300 hover:bg-gray-900">
                   {copy.cta}
@@ -51,7 +38,7 @@ export default function Home() {
                 </button>
               </Link>
               <Link href="/blog">
-                <button className="group flex items-center border border-gray-300 bg-white/70 px-8 py-3 font-light text-black backdrop-blur transition-colors duration-300 hover:border-black">
+                <button className="group flex items-center border border-gray-300 bg-white px-8 py-3 font-light text-black transition-colors duration-300 hover:border-black">
                   {copy.insightsCta}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>

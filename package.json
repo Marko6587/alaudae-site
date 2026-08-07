@@ -67,8 +67,13 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.185.4",
-    "postcss": "^8",
+    "postcss": "8.4.31",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "overrides": {
+      "postcss": "8.4.31"
+    }
   }
 }

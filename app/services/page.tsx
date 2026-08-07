@@ -1,10 +1,28 @@
 "use client"
 
 import { useState } from "react"
+import dynamic from "next/dynamic"
 import Link from "next/link"
 import { ArrowRight, Minus } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { getServices } from "@/lib/content"
+import type { SymbolId } from "@/lib/roman-symbols"
+
+// Three.js scene is client-only and kept out of the initial bundle.
+const RomanSymbolScene = dynamic(() => import("@/components/RomanSymbolScene"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full" aria-hidden="true" />,
+})
+
+// Each practice area assembles from its own Roman symbol.
+const SYMBOL_BY_CATEGORY: Record<string, SymbolId> = {
+  cybersecurity: "cyber",
+  "corporate-security": "corporate",
+  audits: "audits",
+  training: "training",
+  "loss-prevention": "loss",
+  "anti-fraud": "fraud",
+}
 
 export default function ServicesPage() {
   const { language } = useLanguage()
@@ -12,6 +30,7 @@ export default function ServicesPage() {
   const [active, setActive] = useState(copy.categories[0].id)
 
   const current = copy.categories.find((category) => category.id === active) ?? copy.categories[0]
+  const symbol = SYMBOL_BY_CATEGORY[current.id] ?? "cyber"
 
   return (
     <div className="min-h-screen bg-white text-black">
@@ -51,6 +70,14 @@ export default function ServicesPage() {
 
           {/* Active practice area */}
           <section key={current.id} className="animate-in fade-in duration-500 fill-mode-both">
+            {/* Line particles assemble into this category's Roman symbol */}
+            <div className="relative mb-14 h-[340px] overflow-hidden border border-gray-100 bg-[radial-gradient(circle_at_center,#fafafa_0%,#ffffff_70%)] md:h-[460px]">
+              <RomanSymbolScene symbol={symbol} className="absolute inset-0" />
+              <span className="pointer-events-none absolute bottom-4 left-4 font-mono text-[10px] uppercase tracking-[0.25em] text-gray-400">
+                {current.label}
+              </span>
+            </div>
+
             <div className="mb-14 border-b border-gray-100 pb-10">
               <h2 className="text-2xl md:text-3xl font-light mb-4 text-balance">{current.title}</h2>
               <p className="text-base text-black font-light mb-4 text-pretty">{current.tagline}</p>
