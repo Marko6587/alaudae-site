@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* build: postcss 8.4.31 pinned */
 
 /* The site uses a fixed light palette (containers are explicitly bg-white),
    so text/background must not follow the OS dark-mode preference —
