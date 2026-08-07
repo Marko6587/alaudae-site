@@ -23,7 +23,6 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     nav: [
       { name: "Home", path: "/" },
       { name: "Services", path: "/services" },
-      { name: "Projects", path: "/projects" },
       { name: "Blog", path: "/blog" },
       { name: "About", path: "/about" },
       { name: "Contact", path: "/contact" },
@@ -46,7 +45,6 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     nav: [
       { name: "Головна", path: "/" },
       { name: "Послуги", path: "/services" },
-      { name: "Проекти", path: "/projects" },
       { name: "Блог", path: "/blog" },
       { name: "Про нас", path: "/about" },
       { name: "Контакти", path: "/contact" },
@@ -69,7 +67,6 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     nav: [
       { name: "Strona główna", path: "/" },
       { name: "Usługi", path: "/services" },
-      { name: "Projekty", path: "/projects" },
       { name: "Blog", path: "/blog" },
       { name: "O nas", path: "/about" },
       { name: "Kontakt", path: "/contact" },
@@ -92,7 +89,6 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     nav: [
       { name: "Startseite", path: "/" },
       { name: "Leistungen", path: "/services" },
-      { name: "Projekte", path: "/projects" },
       { name: "Blog", path: "/blog" },
       { name: "Über uns", path: "/about" },
       { name: "Kontakt", path: "/contact" },
