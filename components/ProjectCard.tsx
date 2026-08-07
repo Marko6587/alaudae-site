@@ -4,7 +4,19 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useLanguage } from "@/context/language-context"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-export default function ProjectCard({ id, title, description, sections }) {
+interface ProjectSection {
+  title: string
+  content: string[]
+}
+
+interface ProjectCardProps {
+  id: string
+  title: string
+  description: string
+  sections: ProjectSection[]
+}
+
+export default function ProjectCard({ title, description, sections }: ProjectCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const { language } = useLanguage()
 

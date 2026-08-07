@@ -1,126 +1,85 @@
 "use client"
+
 import { useState } from "react"
 import Link from "next/link"
-import { useLanguage } from "@/context/language-context"
-import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
+import { usePathname } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
+import { getSite } from "@/lib/content"
+import { LOCALES, type Locale } from "@/lib/content/types"
 
 export default function Header() {
   const { language, setLanguage } = useLanguage()
+  const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { nav } = getSite(language)
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+  const isActive = (path: string) => (path === "/" ? pathname === "/" : pathname.startsWith(path))
 
-  const getNavItems = () => {
-    switch (language) {
-      case "uk":
-        return [
-          { name: "Головна", path: "/" },
-          { name: "Послуги", path: "/services" },
-          { name: "Проекти", path: "/projects" },
-          { name: "Про нас", path: "/about" },
-          { name: "Контакти", path: "/contact" },
-        ]
-      case "en":
-        return [
-          { name: "Home", path: "/" },
-          { name: "Services", path: "/services" },
-          { name: "Projects", path: "/projects" },
-          { name: "About", path: "/about" },
-          { name: "Contact", path: "/contact" },
-        ]
-      case "pl":
-        return [
-          { name: "Strona główna", path: "/" },
-          { name: "Usługi", path: "/services" },
-          { name: "Projekty", path: "/projects" },
-          { name: "O nas", path: "/about" },
-          { name: "Kontakt", path: "/contact" },
-        ]
-      case "de":
-        return [
-          { name: "Startseite", path: "/" },
-          { name: "Dienstleistungen", path: "/services" },
-          { name: "Projekte", path: "/projects" },
-          { name: "Über uns", path: "/about" },
-          { name: "Kontakt", path: "/contact" },
-        ]
-      default:
-        return [
-          { name: "Главная", path: "/" },
-          { name: "Услуги", path: "/services" },
-          { name: "Проекты", path: "/projects" },
-          { name: "О нас", path: "/about" },
-          { name: "Контакты", path: "/contact" },
-        ]
-    }
-  }
-
-  const navItems = getNavItems()
+  const languageButtons = (
+    <>
+      {LOCALES.map((locale: Locale) => (
+        <button
+          key={locale}
+          type="button"
+          onClick={() => setLanguage(locale)}
+          aria-pressed={language === locale}
+          className={`text-xs uppercase transition-colors duration-200 ${
+            language === locale ? "font-medium text-black" : "font-light text-gray-400 hover:text-black"
+          }`}
+        >
+          {locale}
+        </button>
+      ))}
+    </>
+  )
 
   return (
-    <header className="bg-white text-black py-6 sticky top-0 z-50 border-b border-gray-50">
+    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/90 py-5 text-black backdrop-blur">
       <div className="container mx-auto px-6">
-        <div className="flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 relative">
+        <div className="flex items-center justify-between gap-6">
+          <Link href="/" className="flex shrink-0 items-center gap-2">
+            <div className="relative h-8 w-8">
               <Image src="/logo.png" alt="Alaudae Logo" fill className="object-contain" priority />
             </div>
             <span className="text-lg font-light tracking-wide">ALAUDAE</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-10">
-            {navItems.map((item) => (
+          {/* Desktop navigation */}
+          <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
+            {nav.map((item) => (
               <Link
                 key={item.path}
                 href={item.path}
-                className="text-sm font-light hover:text-black transition-colors duration-200"
+                aria-current={isActive(item.path) ? "page" : undefined}
+                className={`text-sm transition-colors duration-200 ${
+                  isActive(item.path)
+                    ? "font-medium text-black underline decoration-1 underline-offset-8"
+                    : "font-light text-gray-600 hover:text-black"
+                }`}
               >
                 {item.name}
               </Link>
             ))}
           </nav>
 
-          {/* Language Selector */}
-          <div className="hidden md:flex space-x-4">
-            <button
-              onClick={() => setLanguage("en")}
-              className={`text-xs ${language === "en" ? "font-medium" : "font-light text-gray-500"}`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => setLanguage("uk")}
-              className={`text-xs ${language === "uk" ? "font-medium" : "font-light text-gray-500"}`}
-            >
-              UK
-            </button>
-            <button
-              onClick={() => setLanguage("pl")}
-              className={`text-xs ${language === "pl" ? "font-medium" : "font-light text-gray-500"}`}
-            >
-              PL
-            </button>
-            <button
-              onClick={() => setLanguage("de")}
-              className={`text-xs ${language === "de" ? "font-medium" : "font-light text-gray-500"}`}
-            >
-              DE
-            </button>
-          </div>
+          <div className="hidden gap-4 md:flex">{languageButtons}</div>
 
-          {/* Mobile Menu Button */}
-          <button className="md:hidden" onClick={toggleMenu}>
-            <Menu className={`h-6 w-6 ${isMenuOpen ? "hidden" : "block"}`} />
-            <X className={`h-6 w-6 ${isMenuOpen ? "block" : "hidden"}`} />
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-expanded={isMenuOpen}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile menu */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
@@ -128,46 +87,24 @@ export default function Header() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden mt-6"
+              className="overflow-hidden md:hidden"
             >
-              <nav className="flex flex-col space-y-4 mb-6">
-                {navItems.map((item) => (
+              <nav aria-label="Mobile" className="mt-6 flex flex-col gap-4">
+                {nav.map((item) => (
                   <Link
                     key={item.path}
                     href={item.path}
-                    className="text-sm font-light hover:text-black transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
+                    aria-current={isActive(item.path) ? "page" : undefined}
+                    className={`text-sm transition-colors duration-200 ${
+                      isActive(item.path) ? "font-medium text-black" : "font-light text-gray-600 hover:text-black"
+                    }`}
                   >
                     {item.name}
                   </Link>
                 ))}
               </nav>
-              <div className="flex space-x-4 border-t border-gray-100 pt-4">
-                <button
-                  onClick={() => setLanguage("en")}
-                  className={`text-xs ${language === "en" ? "font-medium" : "font-light text-gray-500"}`}
-                >
-                  EN
-                </button>
-                <button
-                  onClick={() => setLanguage("uk")}
-                  className={`text-xs ${language === "uk" ? "font-medium" : "font-light text-gray-500"}`}
-                >
-                  UK
-                </button>
-                <button
-                  onClick={() => setLanguage("pl")}
-                  className={`text-xs ${language === "pl" ? "font-medium" : "font-light text-gray-500"}`}
-                >
-                  PL
-                </button>
-                <button
-                  onClick={() => setLanguage("de")}
-                  className={`text-xs ${language === "de" ? "font-medium" : "font-light text-gray-500"}`}
-                >
-                  DE
-                </button>
-              </div>
+              <div className="mt-6 flex gap-5 border-t border-gray-100 pt-4">{languageButtons}</div>
             </motion.div>
           )}
         </AnimatePresence>

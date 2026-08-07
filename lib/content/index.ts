@@ -11,9 +11,13 @@ import { blogPl } from "./blog/pl"
 import { blogDe } from "./blog/de"
 
 import { contactCopy } from "./contact"
+import { homeCopy } from "./home"
+import { siteCopy } from "./site"
 
 export * from "./types"
-export { contactCopy }
+export type { HomeCopy } from "./home"
+export type { NavItem, SiteCopy } from "./site"
+export { contactCopy, homeCopy, siteCopy }
 
 const services: Record<Locale, ServicesCopy> = {
   en: servicesEn,
@@ -43,6 +47,14 @@ export function getBlog(locale: string): BlogCopy {
 
 export function getContact(locale: string) {
   return contactCopy[normalise(locale)]
+}
+
+export function getHome(locale: string) {
+  return homeCopy[normalise(locale)]
+}
+
+export function getSite(locale: string) {
+  return siteCopy[normalise(locale)]
 }
 
 export function getPost(locale: string, slug: string): BlogPost | undefined {

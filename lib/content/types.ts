@@ -69,9 +69,24 @@ export interface ContactChannel {
   note?: string
 }
 
+export interface ContactFormCopy {
+  heading: string
+  name: string
+  email: string
+  company: string
+  interest: string
+  interestPlaceholder: string
+  message: string
+  consent: string
+  submit: string
+  success: string
+  successNote: string
+}
+
 export interface ContactCopy {
   title: string
   description: string
+  form: ContactFormCopy
   channelsLabel: string
   officesLabel: string
   hoursLabel: string
