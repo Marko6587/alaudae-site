@@ -2,26 +2,16 @@
 
 import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js"
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js"
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js"
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js"
 import { Line2 } from "three/examples/jsm/lines/Line2.js"
 import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js"
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js"
 import { buildCinematicScene, buildFallbackSvg, type Pt } from "@/lib/roman-cinematic"
 
 const SPACING = 0.02 // world units between resampled points (uniform draw speed)
-const LINE_W = 0.018 // stroke thickness in world units (crisp engraved look)
+const LINE_W = 0.014 // stroke thickness in world units (fine, precise ink line)
 
-// Monochrome silver -> bright white gradient. Additive blending + bloom then
-// renders the strokes as glowing brushed steel on pure black.
-const STOPS = [new THREE.Color("#7c7c7c"), new THREE.Color("#c8c8c8"), new THREE.Color("#ffffff")]
-function gradientColor(t: number, out: THREE.Color) {
-  const x = THREE.MathUtils.clamp(t, 0, 1) * (STOPS.length - 1)
-  const i = Math.min(Math.floor(x), STOPS.length - 2)
-  out.copy(STOPS[i]).lerp(STOPS[i + 1], x - i)
-}
+const INK = new THREE.Color("#0a0a0a") // near-black line on a white field
+const PAPER = "#ffffff"
 
 function resample(pts: Pt[], spacing: number): Pt[] {
   if (pts.length === 0) return []
@@ -44,15 +34,16 @@ function resample(pts: Pt[], spacing: number): Pt[] {
   return out
 }
 
-function radialTexture(inner: string, outer: string): THREE.Texture {
+function headTexture(): THREE.Texture {
   const c = document.createElement("canvas")
-  c.width = c.height = 256
+  c.width = c.height = 128
   const ctx = c.getContext("2d")!
-  const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128)
-  g.addColorStop(0, inner)
-  g.addColorStop(1, outer)
+  const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64)
+  g.addColorStop(0, "rgba(10,10,10,1)")
+  g.addColorStop(0.5, "rgba(10,10,10,0.6)")
+  g.addColorStop(1, "rgba(10,10,10,0)")
   ctx.fillStyle = g
-  ctx.fillRect(0, 0, 256, 256)
+  ctx.fillRect(0, 0, 128, 128)
   const tex = new THREE.CanvasTexture(c)
   tex.needsUpdate = true
   return tex
@@ -78,14 +69,11 @@ export default function RomanLineCinematic({ className }: { className?: string }
       return
     }
 
-    // Any failure while building or running the WebGL scene (driver quirks,
-    // blocked context, unsupported post-processing) drops to the static SVG
-    // instead of leaving a permanently black hero.
     let cleanup: (() => void) | undefined
     try {
       cleanup = setupScene(mount, () => setFallback(true))
     } catch (err) {
-      console.log("[v0] cinematic hero setup failed, using SVG fallback:", err)
+      console.log("[v0] line hero setup failed, using SVG fallback:", err)
       setFallback(true)
     }
     return cleanup
@@ -101,11 +89,10 @@ export default function RomanLineCinematic({ className }: { className?: string }
               key={i}
               points={pts}
               fill="none"
-              stroke="#d4d4d4"
-              strokeWidth={0.03}
+              stroke="#0a0a0a"
+              strokeWidth={0.024}
               strokeLinecap="round"
               strokeLinejoin="round"
-              opacity={0.9}
             />
           ))}
         </svg>
@@ -127,12 +114,11 @@ type PieceObj = {
 }
 
 // Builds and runs the whole WebGL scene. Returns a cleanup function.
-// Throws synchronously on setup failure; reports async runtime failures via onRuntimeError.
 function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => void {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
   const scene = new THREE.Scene()
-  scene.background = new THREE.Color("#000000")
+  scene.background = new THREE.Color(PAPER)
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100)
   camera.position.set(0, 0, 9)
@@ -156,7 +142,6 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
   })
 
   const group = new THREE.Group()
-  const col = new THREE.Color()
   const lineObjs: PieceObj[] = []
   const materials: LineMaterial[] = []
 
@@ -166,9 +151,7 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
     const colors: number[] = []
     for (let i = 0; i < count; i++) {
       positions.push(flat[i][0], flat[i][1], z)
-      const globalT = (meta[idx].startLen + i * SPACING) / totalLen
-      gradientColor(globalT, col)
-      colors.push(col.r, col.g, col.b)
+      colors.push(INK.r, INK.g, INK.b)
     }
     const geo = new LineGeometry()
     geo.setPositions(positions)
@@ -180,7 +163,7 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
       vertexColors: true,
       transparent: true,
       opacity: 1,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       depthWrite: false,
       dashed: true,
       dashSize: 1e-4,
@@ -198,90 +181,19 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
   })
   scene.add(group)
 
-  // ---- soft cool halo behind the emblem (subtle, monochrome) ----------------
-  const hazeTex = radialTexture("rgba(255,255,255,0.22)", "rgba(255,255,255,0)")
-  const haze = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1),
-    new THREE.MeshBasicMaterial({
-      map: hazeTex,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      opacity: 0.14,
-    }),
-  )
-  haze.scale.set(width * 1.4, height * 1.4, 1)
-  haze.position.z = -1.2
-  scene.add(haze)
-
-  // ---- drifting dust (cool white motes) -------------------------------------
-  const dustCount = reduced ? 0 : 200
-  const dustPos = new Float32Array(dustCount * 3)
-  const dustVel = new Float32Array(dustCount * 3)
-  for (let i = 0; i < dustCount; i++) {
-    dustPos[i * 3] = (Math.random() - 0.5) * width * 1.8
-    dustPos[i * 3 + 1] = (Math.random() - 0.5) * height * 1.8
-    dustPos[i * 3 + 2] = (Math.random() - 0.5) * 2
-    dustVel[i * 3] = (Math.random() - 0.5) * 0.015
-    dustVel[i * 3 + 1] = 0.008 + Math.random() * 0.016
-    dustVel[i * 3 + 2] = 0
-  }
-  const dustGeo = new THREE.BufferGeometry()
-  dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3))
-  const dust = new THREE.Points(
-    dustGeo,
-    new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: 0.03,
-      transparent: true,
-      opacity: 0.35,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    }),
-  )
-  if (dustCount) scene.add(dust)
-
-  // ---- head sparks (pool) — the bright tip that leaves the trail ------------
-  const sparkMax = reduced ? 0 : 170
-  const sparkPos = new Float32Array(sparkMax * 3)
-  const sparkLife = new Float32Array(sparkMax)
-  const sparkVel = new Float32Array(sparkMax * 3)
-  let sparkCursor = 0
-  const sparkGeo = new THREE.BufferGeometry()
-  sparkGeo.setAttribute("position", new THREE.BufferAttribute(sparkPos, 3))
-  const sparks = new THREE.Points(
-    sparkGeo,
-    new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: 0.07,
-      transparent: true,
-      opacity: 0.9,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    }),
-  )
-  if (sparkMax) scene.add(sparks)
-
-  // a bright glowing head dot that rides the tip of the drawing line
-  const headTex = radialTexture("rgba(255,255,255,1)", "rgba(255,255,255,0)")
+  // ---- a small dark head dot that starts and leads the drawing line ---------
+  const headTex = headTexture()
   const head = new THREE.Sprite(
     new THREE.SpriteMaterial({
       map: headTex,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       depthWrite: false,
       opacity: 0,
     }),
   )
-  head.scale.set(0.28, 0.28, 1)
+  head.scale.set(0.14, 0.14, 1)
   scene.add(head)
-
-  // ---- post-processing bloom (white glow) -----------------------------------
-  const composer = new EffectComposer(renderer)
-  composer.addPass(new RenderPass(scene, camera))
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.72, 0.5, 0.1)
-  composer.addPass(bloom)
-  composer.addPass(new OutputPass())
 
   let baseZ = 9
   const resize = () => {
@@ -296,13 +208,12 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
     baseZ = Math.max(distForH, distForW)
     camera.updateProjectionMatrix()
     renderer.setSize(w, h)
-    composer.setSize(w, h)
     for (const m of materials) m.resolution.set(w, h)
   }
   resize()
   window.addEventListener("resize", resize)
 
-  // pointer parallax
+  // pointer parallax (very subtle for a calm, minimal feel)
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 }
   const onPointer = (e: PointerEvent) => {
     const r = mount.getBoundingClientRect()
@@ -323,21 +234,6 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
   let raf = 0
   let failed = false
 
-  const spawnSpark = (x: number, y: number, z: number) => {
-    if (!sparkMax) return
-    for (let k = 0; k < 2; k++) {
-      const i = sparkCursor
-      sparkPos[i * 3] = x
-      sparkPos[i * 3 + 1] = y
-      sparkPos[i * 3 + 2] = z
-      sparkVel[i * 3] = (Math.random() - 0.5) * 0.05
-      sparkVel[i * 3 + 1] = (Math.random() - 0.5) * 0.05 + 0.015
-      sparkVel[i * 3 + 2] = (Math.random() - 0.5) * 0.03
-      sparkLife[i] = 1
-      sparkCursor = (sparkCursor + 1) % sparkMax
-    }
-  }
-
   const render = () => {
     if (failed) return
     raf = requestAnimationFrame(render)
@@ -345,12 +241,10 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
     const now = (performance.now() - start) / 1000
 
     // Draw the whole shield once over DRAW seconds, then hold it permanently.
-    let alpha = 1
     let progress = 1
     let drawing = false
     if (!reduced && now < DRAW) {
       progress = smoother(now / DRAW)
-      alpha = 0.5 + 0.5 * Math.min(1, now / 1.0)
       drawing = true
     }
     const revealed = progress * totalLen
@@ -365,7 +259,7 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
         continue
       }
       const local = revealed - o.startLen
-      o.mat.opacity = alpha
+      o.mat.opacity = 1
       if (local <= 0) {
         o.mat.dashSize = 1e-4
         o.mat.gapSize = o.len + 1
@@ -385,56 +279,28 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
       }
     }
 
-    // bright travelling head + trailing sparks while the line is drawing
+    // dark travelling head dot while the line is drawing
     if (headSet && drawing) {
       head.position.set(headX, headY, headZ + 0.02)
-      ;(head.material as THREE.SpriteMaterial).opacity = 0.9
-      spawnSpark(headX, headY, headZ)
+      ;(head.material as THREE.SpriteMaterial).opacity = 1
     } else {
-      ;(head.material as THREE.SpriteMaterial).opacity *= 0.9
-    }
-
-    if (sparkMax) {
-      for (let i = 0; i < sparkMax; i++) {
-        if (sparkLife[i] > 0) {
-          sparkLife[i] -= 0.02
-          sparkPos[i * 3] += sparkVel[i * 3]
-          sparkPos[i * 3 + 1] += sparkVel[i * 3 + 1]
-          sparkPos[i * 3 + 2] += sparkVel[i * 3 + 2]
-        } else {
-          sparkPos[i * 3 + 1] = -9999
-        }
-      }
-      sparkGeo.attributes.position.needsUpdate = true
-      ;(sparks.material as THREE.PointsMaterial).opacity = 0.9 * alpha
-    }
-
-    if (dustCount) {
-      for (let i = 0; i < dustCount; i++) {
-        dustPos[i * 3] += dustVel[i * 3]
-        dustPos[i * 3 + 1] += dustVel[i * 3 + 1]
-        if (dustPos[i * 3 + 1] > height) dustPos[i * 3 + 1] = -height
-      }
-      dustGeo.attributes.position.needsUpdate = true
+      ;(head.material as THREE.SpriteMaterial).opacity *= 0.88
     }
 
     pointer.x += (pointer.tx - pointer.x) * 0.05
     pointer.y += (pointer.ty - pointer.y) * 0.05
-    const pushed = reduced ? baseZ * 0.96 : baseZ * (1 + 0.12 * (1 - progress))
-    camera.position.x += (pointer.x * 0.4 - camera.position.x) * 0.05
-    camera.position.y += (-pointer.y * 0.26 - camera.position.y) * 0.05
+    const pushed = reduced ? baseZ * 0.98 : baseZ * (1 + 0.1 * (1 - progress))
+    camera.position.x += (pointer.x * 0.28 - camera.position.x) * 0.05
+    camera.position.y += (-pointer.y * 0.18 - camera.position.y) * 0.05
     camera.position.z += (pushed - camera.position.z) * 0.06
     camera.lookAt(0, 0, 0)
 
-    const pulse = 0.12 + Math.sin(now * 0.5) * 0.025
-    ;(haze.material as THREE.MeshBasicMaterial).opacity = pulse * (0.5 + alpha * 0.5)
-
     try {
-      composer.render()
+      renderer.render(scene, camera)
     } catch (err) {
       failed = true
       cancelAnimationFrame(raf)
-      console.log("[v0] cinematic hero render failed, using SVG fallback:", err)
+      console.log("[v0] line hero render failed, using SVG fallback:", err)
       onRuntimeError()
     }
   }
@@ -446,7 +312,6 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
     window.removeEventListener("resize", resize)
     mount.removeEventListener("pointermove", onPointer)
     io.disconnect()
-    composer.dispose()
     renderer.dispose()
     scene.traverse((obj) => {
       const anyObj = obj as unknown as { geometry?: THREE.BufferGeometry; material?: THREE.Material | THREE.Material[] }
@@ -454,7 +319,6 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
       if (Array.isArray(anyObj.material)) anyObj.material.forEach((m) => m.dispose())
       else anyObj.material?.dispose()
     })
-    hazeTex.dispose()
     headTex.dispose()
     if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement)
   }

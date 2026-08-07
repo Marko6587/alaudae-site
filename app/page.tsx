@@ -22,15 +22,15 @@ export default function Home() {
 
   return (
     <div className="bg-white text-black">
-      {/* Cinematic black hero: a glowing line draws itself into a large Roman scutum */}
-      <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden bg-black">
+      {/* Minimal white hero: a black line draws itself into a large Roman scutum */}
+      <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden bg-white">
         {/* Full-bleed self-drawing shield animation */}
         <RomanLineCinematic className="absolute inset-0 z-0" />
 
         {/* legibility gradient over the lower portion for the copy */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-2/3 bg-gradient-to-t from-white via-white/80 to-transparent"
         />
 
         <div className="container relative z-20 mx-auto px-6 pb-16 md:pb-20">
@@ -41,27 +41,27 @@ export default function Home() {
                 alt="Alaudae Secure Consulting"
                 width={132}
                 height={132}
-                className="h-auto opacity-90 [filter:invert(1)]"
+                className="h-auto opacity-90"
                 priority
               />
             </div>
 
-            <p className="mb-5 text-xs uppercase tracking-[0.3em] text-gray-400">{copy.eyebrow}</p>
-            <h1 className="mb-6 text-3xl font-light leading-tight text-balance text-white md:text-4xl lg:text-5xl">
+            <p className="mb-5 text-xs uppercase tracking-[0.3em] text-gray-500">{copy.eyebrow}</p>
+            <h1 className="mb-6 text-3xl font-light leading-tight text-balance text-black md:text-4xl lg:text-5xl">
               {copy.headline}
             </h1>
-            <p className="mb-4 max-w-xl text-lg font-light text-gray-300 text-pretty">{copy.subtitle}</p>
-            <p className="mb-10 max-w-xl text-base font-light text-gray-400 text-pretty">{copy.description}</p>
+            <p className="mb-4 max-w-xl text-lg font-light text-gray-700 text-pretty">{copy.subtitle}</p>
+            <p className="mb-10 max-w-xl text-base font-light text-gray-500 text-pretty">{copy.description}</p>
 
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link href="/services">
-                <button className="group flex items-center border border-white bg-white px-8 py-3 font-light text-black transition-colors duration-300 hover:bg-gray-200">
+                <button className="group flex items-center border border-black bg-black px-8 py-3 font-light text-white transition-colors duration-300 hover:bg-gray-800">
                   {copy.cta}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </Link>
               <Link href="/blog">
-                <button className="group flex items-center border border-white/30 bg-transparent px-8 py-3 font-light text-white transition-colors duration-300 hover:border-white">
+                <button className="group flex items-center border border-gray-300 bg-transparent px-8 py-3 font-light text-black transition-colors duration-300 hover:border-black">
                   {copy.insightsCta}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
