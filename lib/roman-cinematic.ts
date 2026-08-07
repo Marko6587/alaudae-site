@@ -1,9 +1,10 @@
 // Ordered line geometry for the cinematic "self-drawing" Roman shield hero.
 //
 // Everything is generated as polylines ("pieces") in a shared design space and
-// returned in the exact order the glowing line should trace them, starting from
-// a single point and building the ornate scutum with all its motifs. Each piece
-// also carries a small z so the composition reads with depth/parallax. No art files.
+// returned in the exact order the line should trace them, starting from a
+// single point and building an authentic Roman scutum: a rounded-rectangle
+// body with a riveted bronze border, a central boss (umbo), four symmetric
+// feathered wings and a vertical winged-thunderbolt (fulmen). No art files.
 
 export type Pt = [number, number]
 export type Piece = { pts: Pt[]; z: number }
@@ -25,7 +26,7 @@ function circle(cx: number, cy: number, r: number, seg = 72): Pt[] {
   return arc(cx, cy, r, 0, Math.PI * 2, seg)
 }
 
-function quad(p0: Pt, pc: Pt, p1: Pt, seg = 32): Pt[] {
+function quad(p0: Pt, pc: Pt, p1: Pt, seg = 24): Pt[] {
   const out: Pt[] = []
   for (let i = 0; i <= seg; i++) {
     const t = i / seg
@@ -38,134 +39,142 @@ function quad(p0: Pt, pc: Pt, p1: Pt, seg = 32): Pt[] {
   return out
 }
 
-// A continuous Greek-key (meander) run from A to B. `perp` pushes the pattern
-// to one side (inward). Returns one polyline so it draws as a single stroke.
-function meander(a: Pt, b: Pt, units: number, amp: number): Pt[] {
+// Continuous rounded-rectangle loop (the scutum body), drawn clockwise.
+function roundedRect(hw: number, hh: number, r: number, seg = 12): Pt[] {
+  const out: Pt[] = []
+  out.push([-hw + r, hh], [hw - r, hh]) // top edge
+  for (const q of arc(hw - r, hh - r, r, D(90), D(0), seg)) out.push(q) // TR
+  out.push([hw, -hh + r]) // right edge
+  for (const q of arc(hw - r, -hh + r, r, D(0), D(-90), seg)) out.push(q) // BR
+  out.push([-hw + r, -hh]) // bottom edge
+  for (const q of arc(-hw + r, -hh + r, r, D(-90), D(-180), seg)) out.push(q) // BL
+  out.push([-hw, hh - r]) // left edge
+  for (const q of arc(-hw + r, hh - r, r, D(180), D(90), seg)) out.push(q) // TL
+  return out
+}
+
+// Resample a path into n evenly (arc-length) spaced points — for rivet studs.
+function resample(path: Pt[], n: number): Pt[] {
+  const cum: number[] = [0]
+  let L = 0
+  for (let i = 1; i < path.length; i++) {
+    L += Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1])
+    cum.push(L)
+  }
+  const out: Pt[] = []
+  for (let k = 0; k < n; k++) {
+    const d = (L * k) / n
+    let i = 1
+    while (i < cum.length && cum[i] < d) i++
+    if (i >= path.length) i = path.length - 1
+    const span = cum[i] - cum[i - 1] || 1
+    const t = (d - cum[i - 1]) / span
+    out.push([path[i - 1][0] + (path[i][0] - path[i - 1][0]) * t, path[i - 1][1] + (path[i][1] - path[i - 1][1]) * t])
+  }
+  return out
+}
+
+// Zigzag bolt from a to b with perpendicular deviation (the thunderbolt shaft).
+function zigzag(a: Pt, b: Pt, steps: number, amp: number): Pt[] {
   const dx = b[0] - a[0]
   const dy = b[1] - a[1]
   const len = Math.hypot(dx, dy)
   const dir: Pt = [dx / len, dy / len]
   const perp: Pt = [-dir[1], dir[0]]
-  // one key unit, x along edge (0..1), y along perpendicular (0..1), returns to baseline
-  const unit: Pt[] = [
-    [0, 0],
-    [0, 1],
-    [0.78, 1],
-    [0.78, 0.28],
-    [0.28, 0.28],
-    [0.28, 0.72],
-    [0.52, 0.72],
-    [0.52, 0],
-  ]
   const out: Pt[] = []
-  for (let i = 0; i < units; i++) {
-    for (const [kx, ky] of unit) {
-      const along = (i + kx) / units
-      out.push([
-        a[0] + dir[0] * len * along + perp[0] * ky * amp,
-        a[1] + dir[1] * len * along + perp[1] * ky * amp,
-      ])
-    }
-  }
-  out.push([b[0], b[1]])
-  return out
-}
-
-// small spiral flourish (filigree) starting at p, winding inward
-function spiral(cx: number, cy: number, r: number, turns: number, dir = 1, seg = 40): Pt[] {
-  const out: Pt[] = []
-  for (let i = 0; i <= seg; i++) {
-    const t = i / seg
-    const a = dir * t * Math.PI * 2 * turns
-    const rr = r * (1 - t * 0.85)
-    out.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr])
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps
+    const s = i === 0 || i === steps ? 0 : i % 2 === 0 ? amp : -amp
+    out.push([a[0] + dir[0] * len * t + perp[0] * s, a[1] + dir[1] * len * t + perp[1] * s])
   }
   return out
 }
 
-// ---- the eagle (aquila), reused small at the shield centre ----------------
-
-function aquila(scale: number, ox: number, oy: number): Pt[][] {
-  const S = (p: Pt): Pt => [p[0] * scale + ox, p[1] * scale + oy]
-  const map = (pts: Pt[]) => pts.map(S)
-  const pieces: Pt[][] = []
-  pieces.push(map(circle(0, 1.45, 0.24, 24))) // head
-  pieces.push(map([[0.2, 1.42], [0.6, 1.32]])) // beak
-  pieces.push(map([[0, 1.2], [0, -0.2]])) // body
-  pieces.push(map(quad([0, 0.95], [-1.15, 1.75], [-2.05, 1.15], 26))) // left wing
-  pieces.push(map(quad([0, 0.95], [1.15, 1.75], [2.05, 1.15], 26))) // right wing
-  for (let i = 1; i <= 4; i++) {
-    const t = i / 5
-    pieces.push(map([[-t * 1.75, 1.35 - t * 0.1], [-t * 1.75, 0.95 - t * 0.12]]))
-    pieces.push(map([[t * 1.75, 1.35 - t * 0.1], [t * 1.75, 0.95 - t * 0.12]]))
-  }
-  pieces.push(map([[0, -0.2], [-0.42, -1.0]])) // tail feathers
-  pieces.push(map([[0, -0.2], [0, -1.12]]))
-  pieces.push(map([[0, -0.2], [0.42, -1.0]]))
-  return pieces
+// A single curved feather stroke from a root, sweeping in a direction, hooking.
+function feather(ox: number, oy: number, ang: number, len: number, curl: number): Pt[] {
+  const dir: Pt = [Math.cos(ang), Math.sin(ang)]
+  const perp: Pt = [-dir[1], dir[0]]
+  const tip: Pt = [ox + dir[0] * len, oy + dir[1] * len]
+  const mid: Pt = [ox + dir[0] * len * 0.5 + perp[0] * curl, oy + dir[1] * len * 0.5 + perp[1] * curl]
+  return quad([ox, oy], mid, tip, 18)
 }
+
+// An eagle wing (upper-right): tall inner primaries next to the thunderbolt
+// shading down to short, down-curling outer feathers, plus a leading-edge
+// contour across the tips so the wing reads as a solid, neat silhouette.
+function wing(): Pt[][] {
+  const out: Pt[][] = []
+  const tips: Pt[] = []
+  const n = 7
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1) // 0 = inner (by the bolt), 1 = outer
+    const ang = D(86 - t * 76) // near-vertical inner -> near-horizontal outer
+    const len = 1.15 * (0.5 + 0.5 * (1 - t)) // long inner, short outer
+    const rx = 0.14 + t * 0.24
+    const ry = 0.36 - t * 0.26
+    const curl = -0.09 - t * 0.16 // outer tips droop/curl outward
+    const f = feather(rx, ry, ang, len, curl)
+    out.push(f)
+    tips.push(f[f.length - 1])
+  }
+  out.push(tips) // leading-edge contour across the feather tips
+  return out
+}
+
+const mirrorX = (pts: Pt[]): Pt[] => pts.map(([x, y]) => [-x, y] as Pt)
+const mirrorY = (pts: Pt[]): Pt[] => pts.map(([x, y]) => [x, -y] as Pt)
 
 // ---- the full ordered scene: the scutum, drawn as one journey -------------
+
+const HW = 1.5 // half width
+const HH = 2.15 // half height
+const CR = 0.4 // corner radius
 
 function rawScene(): Piece[] {
   const p: Piece[] = []
 
-  // 1) shield barrel outline as one continuous loop (the line's opening journey)
-  const outline: Pt[] = [
-    [-1.55, 2.15],
-    [1.55, 2.15],
-    ...quad([1.55, 2.15], [1.95, 0], [1.55, -2.15], 28),
-    [-1.55, -2.15],
-    ...quad([-1.55, -2.15], [-1.95, 0], [-1.55, 2.15], 28),
-  ]
-  p.push({ pts: outline, z: 0 })
+  // 1) shield body outline — the line's opening journey around the barrel
+  p.push({ pts: roundedRect(HW, HH, CR, 14), z: 0 })
 
-  // 2) Greek-key meander border, one run per edge (inset from the outline)
-  const bx = 1.28
-  const by = 1.85
-  p.push({ pts: meander([-bx, by], [bx, by], 6, -0.26), z: 0.04 }) // top (push down/in)
-  p.push({ pts: meander([bx, -by], [-bx, -by], 6, -0.26), z: 0.04 }) // bottom
-  p.push({ pts: meander([-bx, -by], [-bx, by], 5, 0.26), z: 0.04 }) // left
-  p.push({ pts: meander([bx, by], [bx, -by], 5, 0.26), z: 0.04 }) // right
+  // 2) inner border line (defines the bronze rim band)
+  const t = 0.26
+  p.push({ pts: roundedRect(HW - t, HH - t, CR - t * 0.5, 14), z: 0.02 })
 
-  // 3) central ridge
-  p.push({ pts: [[0, 1.55], [0, -1.55]], z: 0.06 })
-
-  // 4) radiating sunburst behind the boss
-  const rays = 24
-  for (let i = 0; i < rays; i++) {
-    const a = (i / rays) * Math.PI * 2
-    p.push({
-      pts: [
-        [Math.cos(a) * 0.62, Math.sin(a) * 0.62],
-        [Math.cos(a) * 1.15, Math.sin(a) * 1.15],
-      ],
-      z: 0.05,
-    })
+  // 3) rivet studs evenly spaced along the middle of the rim band
+  const studPath = roundedRect(HW - t * 0.5, HH - t * 0.5, CR - t * 0.25, 24)
+  for (const [sx, sy] of resample(studPath, 34)) {
+    p.push({ pts: circle(sx, sy, 0.045, 12), z: 0.03 })
   }
 
-  // 5) laurel ring around the centre (two branches + outward leaves)
-  const R = 1.22
-  p.push({ pts: arc(0, 0, R, D(102), D(258), 40), z: 0.07 })
-  p.push({ pts: arc(0, 0, R, D(78), D(-78), 40), z: 0.07 })
-  for (let a = 100; a <= 260; a += 20) {
-    p.push({ pts: [[Math.cos(D(a)) * R, Math.sin(D(a)) * R], [Math.cos(D(a)) * (R + 0.34), Math.sin(D(a)) * (R + 0.34)]], z: 0.07 })
+  // 4) vertical thunderbolt shaft (zigzag) above and below the boss
+  p.push({ pts: zigzag([0, 0.5], [0, HH - t - 0.28], 6, 0.055), z: 0.06 })
+  p.push({ pts: zigzag([0, -0.5], [0, -(HH - t - 0.28)], 6, 0.055), z: 0.06 })
+
+  // 5) trident finial (top) and barbed arrow finial (bottom)
+  const top = HH - t - 0.28
+  p.push({ pts: [[0, top], [0, top + 0.3]], z: 0.06 })
+  p.push({ pts: [[0, top + 0.06], [-0.17, top + 0.32]], z: 0.06 })
+  p.push({ pts: [[0, top + 0.06], [0.17, top + 0.32]], z: 0.06 })
+  const bot = -(HH - t - 0.28)
+  p.push({ pts: [[0, bot], [0, bot - 0.3]], z: 0.06 })
+  p.push({ pts: [[0, bot - 0.3], [-0.15, bot - 0.12]], z: 0.06 })
+  p.push({ pts: [[0, bot - 0.3], [0.15, bot - 0.12]], z: 0.06 })
+
+  // 6) four symmetric eagle wings emerging from behind the boss
+  const upperRight = wing()
+  for (const f of upperRight) p.push({ pts: f, z: 0.08 })
+  for (const f of upperRight) p.push({ pts: mirrorX(f), z: 0.08 }) // upper left
+  for (const f of upperRight) p.push({ pts: mirrorY(f), z: 0.08 }) // lower right
+  for (const f of upperRight) p.push({ pts: mirrorX(mirrorY(f)), z: 0.08 }) // lower left
+
+  // 7) central boss (umbo): rim, inner ring, domed centre and a ring of rivets
+  p.push({ pts: circle(0, 0, 0.36, 44), z: 0.11 })
+  p.push({ pts: circle(0, 0, 0.28, 40), z: 0.12 })
+  p.push({ pts: circle(0, 0, 0.12, 28), z: 0.13 }) // domed centre
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2
+    p.push({ pts: circle(Math.cos(a) * 0.32, Math.sin(a) * 0.32, 0.022, 10), z: 0.12 })
   }
-  for (let a = -80; a <= 80; a += 20) {
-    p.push({ pts: [[Math.cos(D(a)) * R, Math.sin(D(a)) * R], [Math.cos(D(a)) * (R + 0.34), Math.sin(D(a)) * (R + 0.34)]], z: 0.07 })
-  }
-
-  // 6) the eagle at the centre
-  for (const piece of aquila(0.46, 0, -0.05)) p.push({ pts: piece, z: 0.1 })
-
-  // 7) central boss
-  p.push({ pts: circle(0, 0.05, 0.32, 40), z: 0.11 })
-
-  // 8) filigree flourishes in all four corners
-  p.push({ pts: spiral(-1.05, 1.5, 0.3, 1.4, 1, 34), z: 0.05 })
-  p.push({ pts: spiral(1.05, 1.5, 0.3, 1.4, -1, 34), z: 0.05 })
-  p.push({ pts: spiral(-1.05, -1.5, 0.3, 1.4, -1, 34), z: 0.05 })
-  p.push({ pts: spiral(1.05, -1.5, 0.3, 1.4, 1, 34), z: 0.05 })
 
   return p
 }
@@ -197,5 +206,5 @@ export function buildCinematicScene(): { pieces: Piece[]; width: number; height:
 export function buildFallbackSvg(): { viewBox: string; polylines: string[] } {
   const { pieces } = buildCinematicScene()
   const polylines = pieces.map(({ pts }) => pts.map(([x, y]) => `${x.toFixed(3)},${(-y).toFixed(3)}`).join(" "))
-  return { viewBox: "-2.6 -2.9 5.2 5.8", polylines }
+  return { viewBox: "-2.4 -2.7 4.8 5.4", polylines }
 }
