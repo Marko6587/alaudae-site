@@ -6,21 +6,26 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js"
+import { Line2 } from "three/examples/jsm/lines/Line2.js"
+import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js"
+import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js"
 import { buildCinematicScene, buildFallbackSvg, type Pt } from "@/lib/roman-cinematic"
 
-const SPACING = 0.03 // world units between resampled points (uniform draw speed)
+const SPACING = 0.02 // world units between resampled points (uniform draw speed)
+const LINE_W = 0.02 // stroke thickness in world units (crisp engraved look)
 
-// bronze -> warm gold gradient stops
-const STOPS = [new THREE.Color("#b0742c"), new THREE.Color("#e0a84a"), new THREE.Color("#ffe4ad")]
+// Monochrome silver -> bright white gradient. Additive blending + bloom then
+// renders the strokes as glowing brushed steel on pure black.
+const STOPS = [new THREE.Color("#7c7c7c"), new THREE.Color("#c8c8c8"), new THREE.Color("#ffffff")]
 function gradientColor(t: number, out: THREE.Color) {
   const x = THREE.MathUtils.clamp(t, 0, 1) * (STOPS.length - 1)
   const i = Math.min(Math.floor(x), STOPS.length - 2)
   out.copy(STOPS[i]).lerp(STOPS[i + 1], x - i)
 }
 
-function resample(pts: Pt[], spacing: number): number[] {
+function resample(pts: Pt[], spacing: number): Pt[] {
   if (pts.length === 0) return []
-  const out: number[] = [pts[0][0], pts[0][1]]
+  const out: Pt[] = [pts[0]]
   let carry = 0
   for (let i = 0; i < pts.length - 1; i++) {
     const [ax, ay] = pts[i]
@@ -30,12 +35,12 @@ function resample(pts: Pt[], spacing: number): number[] {
     let d = carry
     while (d < segLen) {
       const t = d / segLen
-      out.push(ax + (bx - ax) * t, ay + (by - ay) * t)
+      out.push([ax + (bx - ax) * t, ay + (by - ay) * t])
       d += spacing
     }
     carry = d - segLen
   }
-  out.push(pts[pts.length - 1][0], pts[pts.length - 1][1])
+  out.push(pts[pts.length - 1])
   return out
 }
 
@@ -96,7 +101,7 @@ export default function RomanLineCinematic({ className }: { className?: string }
               key={i}
               points={pts}
               fill="none"
-              stroke="#c8862f"
+              stroke="#d4d4d4"
               strokeWidth={0.03}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -111,6 +116,16 @@ export default function RomanLineCinematic({ className }: { className?: string }
   return <div ref={mountRef} className={className} aria-hidden="true" />
 }
 
+type PieceObj = {
+  line: Line2
+  mat: LineMaterial
+  count: number
+  startLen: number
+  len: number
+  z: number
+  flat: Pt[]
+}
+
 // Builds and runs the whole WebGL scene. Returns a cleanup function.
 // Throws synchronously on setup failure; reports async runtime failures via onRuntimeError.
 function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => void {
@@ -123,104 +138,111 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
   camera.position.set(0, 0, 9)
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.setSize(mount.clientWidth || 1, mount.clientHeight || 1)
   mount.appendChild(renderer.domElement)
 
-  // ---- build line geometry --------------------------------------------------
+  // ---- build thick-line geometry (Line2) ------------------------------------
   const { pieces, width, height } = buildCinematicScene()
 
   const resampled = pieces.map((p) => ({ flat: resample(p.pts, SPACING), z: p.z }))
   let totalLen = 0
-  const meta = resampled.map(({ flat, z }) => {
-    const count = flat.length / 2
+  const meta = resampled.map(({ flat }) => {
+    const count = flat.length
     const len = (count - 1) * SPACING
     const startLen = totalLen
     totalLen += len
-    return { count, len, startLen, z }
+    return { count, len, startLen }
   })
 
   const group = new THREE.Group()
   const col = new THREE.Color()
-  const lineObjs: { line: THREE.Line; count: number; startLen: number; len: number; z: number; flat: number[] }[] = []
+  const lineObjs: PieceObj[] = []
+  const materials: LineMaterial[] = []
 
   resampled.forEach(({ flat, z }, idx) => {
-    const count = flat.length / 2
-    const positions = new Float32Array(count * 3)
-    const colors = new Float32Array(count * 3)
+    const count = flat.length
+    const positions: number[] = []
+    const colors: number[] = []
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = flat[i * 2]
-      positions[i * 3 + 1] = flat[i * 2 + 1]
-      positions[i * 3 + 2] = z
+      positions.push(flat[i][0], flat[i][1], z)
       const globalT = (meta[idx].startLen + i * SPACING) / totalLen
       gradientColor(globalT, col)
-      colors[i * 3] = col.r
-      colors[i * 3 + 1] = col.g
-      colors[i * 3 + 2] = col.b
+      colors.push(col.r, col.g, col.b)
     }
-    const geo = new THREE.BufferGeometry()
-    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3))
-    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3))
-    const mat = new THREE.LineBasicMaterial({
+    const geo = new LineGeometry()
+    geo.setPositions(positions)
+    geo.setColors(colors)
+
+    const mat = new LineMaterial({
+      linewidth: LINE_W,
+      worldUnits: true,
       vertexColors: true,
       transparent: true,
       opacity: 1,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
+      dashed: true,
+      dashSize: 1e-4,
+      gapSize: meta[idx].len + 1,
     })
-    const line = new THREE.Line(geo, mat)
-    geo.setDrawRange(0, reduced ? count : 0)
+    const line = new Line2(geo, mat)
+    line.computeLineDistances()
+    if (reduced) {
+      mat.dashSize = meta[idx].len
+      mat.gapSize = 1e-4
+    }
     group.add(line)
-    lineObjs.push({ line, count, startLen: meta[idx].startLen, len: meta[idx].len, z, flat })
+    materials.push(mat)
+    lineObjs.push({ line, mat, count, startLen: meta[idx].startLen, len: meta[idx].len, z, flat })
   })
   scene.add(group)
 
-  // ---- warm haze + volumetric streaks ---------------------------------------
-  const hazeTex = radialTexture("rgba(200,134,47,0.35)", "rgba(200,134,47,0)")
+  // ---- soft cool halo behind the emblem (subtle, monochrome) ----------------
+  const hazeTex = radialTexture("rgba(255,255,255,0.22)", "rgba(255,255,255,0)")
   const haze = new THREE.Mesh(
     new THREE.PlaneGeometry(1, 1),
-    new THREE.MeshBasicMaterial({ map: hazeTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.16 }),
+    new THREE.MeshBasicMaterial({
+      map: hazeTex,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      opacity: 0.14,
+    }),
   )
-  haze.scale.set(width * 1.5, height * 1.5, 1)
+  haze.scale.set(width * 1.4, height * 1.4, 1)
   haze.position.z = -1.2
   scene.add(haze)
 
-  const streakTex = radialTexture("rgba(255,225,160,0.4)", "rgba(255,225,160,0)")
-  const streaks: THREE.Mesh[] = []
-  for (let i = 0; i < 2; i++) {
-    const s = new THREE.Mesh(
-      new THREE.PlaneGeometry(1, 1),
-      new THREE.MeshBasicMaterial({ map: streakTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.05 }),
-    )
-    s.scale.set(0.28, height * 2.6, 1)
-    s.position.z = -0.8
-    s.rotation.z = i === 0 ? 0.5 : -0.7
-    scene.add(s)
-    streaks.push(s)
-  }
-
-  // ---- drifting dust --------------------------------------------------------
-  const dustCount = reduced ? 0 : 240
+  // ---- drifting dust (cool white motes) -------------------------------------
+  const dustCount = reduced ? 0 : 180
   const dustPos = new Float32Array(dustCount * 3)
   const dustVel = new Float32Array(dustCount * 3)
   for (let i = 0; i < dustCount; i++) {
     dustPos[i * 3] = (Math.random() - 0.5) * width * 1.6
     dustPos[i * 3 + 1] = (Math.random() - 0.5) * height * 1.8
     dustPos[i * 3 + 2] = (Math.random() - 0.5) * 2
-    dustVel[i * 3] = (Math.random() - 0.5) * 0.02
-    dustVel[i * 3 + 1] = 0.01 + Math.random() * 0.02
+    dustVel[i * 3] = (Math.random() - 0.5) * 0.015
+    dustVel[i * 3 + 1] = 0.008 + Math.random() * 0.016
     dustVel[i * 3 + 2] = 0
   }
   const dustGeo = new THREE.BufferGeometry()
   dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3))
   const dust = new THREE.Points(
     dustGeo,
-    new THREE.PointsMaterial({ color: 0xffcf8a, size: 0.045, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false }),
+    new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.035,
+      transparent: true,
+      opacity: 0.35,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
   )
   if (dustCount) scene.add(dust)
 
   // ---- head sparks (pool) ---------------------------------------------------
-  const sparkMax = reduced ? 0 : 160
+  const sparkMax = reduced ? 0 : 150
   const sparkPos = new Float32Array(sparkMax * 3)
   const sparkLife = new Float32Array(sparkMax)
   const sparkVel = new Float32Array(sparkMax * 3)
@@ -229,14 +251,21 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
   sparkGeo.setAttribute("position", new THREE.BufferAttribute(sparkPos, 3))
   const sparks = new THREE.Points(
     sparkGeo,
-    new THREE.PointsMaterial({ color: 0xffe6a0, size: 0.09, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }),
+    new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.07,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
   )
   if (sparkMax) scene.add(sparks)
 
-  // ---- post-processing bloom ------------------------------------------------
+  // ---- post-processing bloom (white glow) -----------------------------------
   const composer = new EffectComposer(renderer)
   composer.addPass(new RenderPass(scene, camera))
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.62, 0.4, 0.18)
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.7, 0.5, 0.12)
   composer.addPass(bloom)
   composer.addPass(new OutputPass())
 
@@ -253,6 +282,7 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
     camera.updateProjectionMatrix()
     renderer.setSize(w, h)
     composer.setSize(w, h)
+    for (const m of materials) m.resolution.set(w, h)
   }
   resize()
   window.addEventListener("resize", resize)
@@ -273,11 +303,10 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
 
   // ---- animation ------------------------------------------------------------
   const smoother = (t: number) => t * t * t * (t * (t * 6 - 15) + 10)
-  const DRAW = 8.0 // the line draws itself once, then the emblem holds permanently
+  const DRAW = 8.5 // the line draws itself once, then the emblem holds permanently
   const start = performance.now()
   let raf = 0
   let failed = false
-  const headV = new THREE.Vector3()
 
   const spawnSpark = (x: number, y: number, z: number) => {
     if (!sparkMax) return
@@ -286,9 +315,9 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
       sparkPos[i * 3] = x
       sparkPos[i * 3 + 1] = y
       sparkPos[i * 3 + 2] = z
-      sparkVel[i * 3] = (Math.random() - 0.5) * 0.06
-      sparkVel[i * 3 + 1] = (Math.random() - 0.5) * 0.06 + 0.02
-      sparkVel[i * 3 + 2] = (Math.random() - 0.5) * 0.04
+      sparkVel[i * 3] = (Math.random() - 0.5) * 0.05
+      sparkVel[i * 3 + 1] = (Math.random() - 0.5) * 0.05 + 0.015
+      sparkVel[i * 3 + 2] = (Math.random() - 0.5) * 0.03
       sparkLife[i] = 1
       sparkCursor = (sparkCursor + 1) % sparkMax
     }
@@ -301,31 +330,44 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
     const now = (performance.now() - start) / 1000
 
     // Draw the whole emblem once over DRAW seconds, then hold it permanently.
-    // It never erases, so the hero is never blank after the initial reveal.
     let alpha = 1
     let progress = 1
     if (!reduced && now < DRAW) {
       progress = smoother(now / DRAW)
-      alpha = 0.55 + 0.45 * Math.min(1, now / 1.0)
+      alpha = 0.5 + 0.5 * Math.min(1, now / 1.0)
     }
     const revealed = progress * totalLen
 
+    let headX = 0
+    let headY = 0
+    let headZ = 0
     let headSet = false
     for (const o of lineObjs) {
+      if (reduced) {
+        o.mat.opacity = 1
+        continue
+      }
       const local = revealed - o.startLen
-      let count: number
-      if (local <= 0) count = 0
-      else if (local >= o.len) count = o.count
-      else count = Math.max(1, Math.min(o.count, Math.round(local / SPACING) + 1))
-      o.line.geometry.setDrawRange(0, reduced ? o.count : count)
-      ;(o.line.material as THREE.LineBasicMaterial).opacity = alpha
-      if (!reduced && count > 0 && count < o.count && !headSet) {
-        const hi = (count - 1) * 2
-        headV.set(o.flat[hi], o.flat[hi + 1], o.z)
-        headSet = true
+      o.mat.opacity = alpha
+      if (local <= 0) {
+        o.mat.dashSize = 1e-4
+        o.mat.gapSize = o.len + 1
+      } else if (local >= o.len) {
+        o.mat.dashSize = o.len
+        o.mat.gapSize = 1e-4
+      } else {
+        o.mat.dashSize = local
+        o.mat.gapSize = o.len + 1
+        if (!headSet) {
+          const hi = Math.max(0, Math.min(o.count - 1, Math.round(local / SPACING)))
+          headX = o.flat[hi][0]
+          headY = o.flat[hi][1]
+          headZ = o.z
+          headSet = true
+        }
       }
     }
-    if (headSet && alpha > 0.5) spawnSpark(headV.x, headV.y, headV.z)
+    if (headSet && alpha > 0.5) spawnSpark(headX, headY, headZ)
 
     if (sparkMax) {
       for (let i = 0; i < sparkMax; i++) {
@@ -353,18 +395,14 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
 
     pointer.x += (pointer.tx - pointer.x) * 0.05
     pointer.y += (pointer.ty - pointer.y) * 0.05
-    const pushed = reduced ? baseZ * 0.94 : baseZ * (1 + 0.16 * (1 - progress))
-    camera.position.x += (pointer.x * 0.6 - camera.position.x) * 0.05
-    camera.position.y += (-pointer.y * 0.4 - camera.position.y) * 0.05
+    const pushed = reduced ? baseZ * 0.94 : baseZ * (1 + 0.14 * (1 - progress))
+    camera.position.x += (pointer.x * 0.5 - camera.position.x) * 0.05
+    camera.position.y += (-pointer.y * 0.32 - camera.position.y) * 0.05
     camera.position.z += (pushed - camera.position.z) * 0.06
     camera.lookAt(0, 0, 0)
 
-    const pulse = 0.15 + Math.sin(now * 0.6) * 0.03
+    const pulse = 0.12 + Math.sin(now * 0.5) * 0.025
     ;(haze.material as THREE.MeshBasicMaterial).opacity = pulse * (0.5 + alpha * 0.5)
-    streaks.forEach((s, i) => {
-      s.rotation.z += i === 0 ? 0.0006 : -0.0004
-      ;(s.material as THREE.MeshBasicMaterial).opacity = 0.05 * alpha
-    })
 
     try {
       composer.render()
@@ -392,7 +430,6 @@ function setupScene(mount: HTMLDivElement, onRuntimeError: () => void): () => vo
       else anyObj.material?.dispose()
     })
     hazeTex.dispose()
-    streakTex.dispose()
     if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement)
   }
 }

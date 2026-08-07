@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="bg-white text-black">
-      {/* Cinematic black hero: a glowing bronze line draws a Roman scutum, then a gladius and crossed spears */}
+      {/* Cinematic black hero: a glowing silver line draws a Roman scutum, then a gladius and crossed spears */}
       <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden bg-black">
         <RomanLineCinematic className="absolute inset-0 z-0" />
 
@@ -45,7 +45,7 @@ export default function Home() {
               />
             </div>
 
-            <p className="mb-5 text-xs uppercase tracking-[0.3em] text-[#c8862f]">{copy.eyebrow}</p>
+            <p className="mb-5 text-xs uppercase tracking-[0.3em] text-gray-400">{copy.eyebrow}</p>
             <h1 className="mb-6 text-3xl font-light leading-tight text-balance text-white md:text-4xl lg:text-5xl">
               {copy.headline}
             </h1>
