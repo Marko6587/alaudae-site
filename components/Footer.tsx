@@ -1,154 +1,95 @@
 "use client"
-import { useLanguage } from "@/context/language-context"
+
 import Link from "next/link"
 import Image from "next/image"
+import { useLanguage } from "@/context/language-context"
+import { getContact, getSite } from "@/lib/content"
 
 export default function Footer() {
   const { language } = useLanguage()
-
-  const getFooterContent = () => {
-    switch (language) {
-      case "uk":
-        return {
-          companyInfo: "Alaudae — інтелектуальні рішення для бізнесу",
-          rights: "© 2023 Alaudae. Всі права захищені.",
-          navigation: "Навігація",
-          services: "Послуги",
-          contact: "Контакти",
-          address: "Адреса",
-          addressLine: "вул. Бізнес-центр, 123, Київ, Україна",
-          phone: "Телефон",
-          email: "Електронна пошта",
-        }
-      case "en":
-        return {
-          companyInfo: "Alaudae — intelligent business solutions",
-          rights: "© 2023 Alaudae. All rights reserved.",
-          navigation: "Navigation",
-          services: "Services",
-          contact: "Contact",
-          address: "Address",
-          addressLine: "Business Center St., 123, Kyiv, Ukraine",
-          phone: "Phone",
-          email: "Email",
-        }
-      case "pl":
-        return {
-          companyInfo: "Alaudae — inteligentne rozwiązania biznesowe",
-          rights: "© 2023 Alaudae. Wszelkie prawa zastrzeżone.",
-          navigation: "Nawigacja",
-          services: "Usługi",
-          contact: "Kontakt",
-          address: "Adres",
-          addressLine: "ul. Centrum Biznesowe, 123, Kijów, Ukraina",
-          phone: "Telefon",
-          email: "E-mail",
-        }
-      case "de":
-        return {
-          companyInfo: "Alaudae — intelligente Geschäftslösungen",
-          rights: "© 2023 Alaudae. Alle Rechte vorbehalten.",
-          navigation: "Navigation",
-          services: "Dienstleistungen",
-          contact: "Kontakt",
-          address: "Adresse",
-          addressLine: "Geschäftszentrum Str., 123, Kiew, Ukraine",
-          phone: "Telefon",
-          email: "E-Mail",
-        }
-      default:
-        return {
-          companyInfo: "Alaudae — интеллектуальные решения для бизнеса",
-          rights: "© 2023 Alaudae. Все права защищены.",
-          navigation: "Навигация",
-          services: "Услуги",
-          contact: "Контакты",
-          address: "Адрес",
-          addressLine: "ул. Бизнес-центр, 123, Киев, Украина",
-          phone: "Телефон",
-          email: "Электронная почта",
-        }
-    }
-  }
-
-  const content = getFooterContent()
+  const site = getSite(language)
+  const contact = getContact(language)
+  const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-white text-black py-16 border-t border-gray-100">
+    <footer className="border-t border-gray-100 bg-white py-16 text-black">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          {/* Company Info */}
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
+          {/* Company */}
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-6 h-6 relative">
-                <Image src="/logo.png" alt="Alaudae Logo" fill className="object-contain" priority />
+            <div className="mb-5 flex items-center gap-2">
+              <div className="relative h-6 w-6">
+                <Image src="/logo.png" alt="Alaudae Logo" fill className="object-contain" />
               </div>
               <span className="text-sm font-light tracking-wide">ALAUDAE</span>
             </div>
-            <p className="text-sm text-gray-500 font-light mb-4">{content.companyInfo}</p>
-            <p className="text-xs text-gray-400 font-light">{content.rights}</p>
+            <p className="mb-8 max-w-sm text-sm font-light leading-relaxed text-gray-500 text-pretty">
+              {site.tagline}
+            </p>
+            <p className="text-xs font-light text-gray-400">
+              © {year} Alaudae. {site.rights}
+            </p>
           </div>
 
-          {/* Navigation */}
+          {/* Practice areas */}
           <div>
-            <h3 className="text-sm font-medium mb-4">{content.navigation}</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/" className="text-sm text-gray-500 font-light hover:text-black transition duration-300">
-                  {language === "uk"
-                    ? "Головна"
-                    : language === "en"
-                      ? "Home"
-                      : language === "pl"
-                        ? "Strona główna"
-                        : language === "de"
-                          ? "Startseite"
-                          : "Главная"}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about"
-                  className="text-sm text-gray-500 font-light hover:text-black transition duration-300"
-                >
-                  {language === "uk"
-                    ? "Про нас"
-                    : language === "en"
-                      ? "About"
-                      : language === "pl"
-                        ? "O nas"
-                        : language === "de"
-                          ? "Über uns"
-                          : "О нас"}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/projects"
-                  className="text-sm text-gray-500 font-light hover:text-black transition duration-300"
-                >
-                  {language === "uk"
-                    ? "Проекти"
-                    : language === "en"
-                      ? "Projects"
-                      : language === "pl"
-                        ? "Projekty"
-                        : language === "de"
-                          ? "Projekte"
-                          : "Проекты"}
-                </Link>
-              </li>
+            <h2 className="mb-5 text-xs uppercase tracking-[0.2em] text-gray-400">{site.servicesLabel}</h2>
+            <ul className="flex flex-col gap-2.5">
+              {site.practices.map((practice) => (
+                <li key={practice.label}>
+                  <Link
+                    href={practice.href}
+                    className="text-sm font-light text-gray-500 transition-colors duration-200 hover:text-black"
+                  >
+                    {practice.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="text-sm font-medium mb-4">{content.contact}</h3>
-            <ul className="space-y-2">
-              <li className="text-sm text-gray-500 font-light">{content.addressLine}</li>
-              <li className="text-sm text-gray-500 font-light">+380 44 123 4567</li>
-              <li className="text-sm text-gray-500 font-light">info@alaudae.com</li>
-            </ul>
+          {/* Company links + contact */}
+          <div className="flex flex-col gap-10">
+            <div>
+              <h2 className="mb-5 text-xs uppercase tracking-[0.2em] text-gray-400">{site.companyLabel}</h2>
+              <ul className="flex flex-col gap-2.5">
+                {site.nav
+                  .filter((item) => item.path !== "/" && item.path !== "/services")
+                  .map((item) => (
+                    <li key={item.path}>
+                      <Link
+                        href={item.path}
+                        className="text-sm font-light text-gray-500 transition-colors duration-200 hover:text-black"
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+
+            <div>
+              <h2 className="mb-5 text-xs uppercase tracking-[0.2em] text-gray-400">{site.contactLabel}</h2>
+              <ul className="flex flex-col gap-2.5">
+                {contact.channels.slice(0, 2).map((channel) => (
+                  <li key={channel.value}>
+                    {channel.href ? (
+                      <a
+                        href={channel.href}
+                        className="text-sm font-light text-gray-500 transition-colors duration-200 hover:text-black"
+                      >
+                        {channel.value}
+                      </a>
+                    ) : (
+                      <span className="text-sm font-light text-gray-500">{channel.value}</span>
+                    )}
+                  </li>
+                ))}
+                <li className="text-sm font-light text-gray-500">
+                  {contact.offices[0].city}, {contact.offices[0].country}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
