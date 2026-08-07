@@ -56,7 +56,7 @@ export default function RomanSymbolScene({ symbol, className }: RomanSymbolScene
     const mount = mountRef.current
     if (!mount) return
 
-    const count = window.innerWidth < 768 ? 520 : 1100
+    const count = window.innerWidth < 768 ? 700 : 1300
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100)
@@ -95,7 +95,7 @@ export default function RomanSymbolScene({ symbol, className }: RomanSymbolScene
     const dot = makeDotTexture()
     const material = new THREE.PointsMaterial({
       color: 0x111111,
-      size: window.innerWidth < 768 ? 0.07 : 0.055,
+      size: window.innerWidth < 768 ? 0.1 : 0.08,
       map: dot,
       transparent: true,
       depthWrite: false,
@@ -118,8 +118,10 @@ export default function RomanSymbolScene({ symbol, className }: RomanSymbolScene
     const readProgress = () => {
       const rect = mount.getBoundingClientRect()
       const vh = window.innerHeight || 1
-      // 0 as the section enters from the bottom, 1 once it is well into view
-      const raw = (vh * 0.92 - rect.top) / (vh * 0.62)
+      // Fully assembled once the panel is roughly half in view, and it stays
+      // assembled while it sits higher up — so the symbol is solid whenever the
+      // visitor is actually looking at this section.
+      const raw = (vh * 0.85 - rect.top) / (vh * 0.3)
       targetProgress = clamp01(raw)
     }
 
@@ -157,8 +159,12 @@ export default function RomanSymbolScene({ symbol, className }: RomanSymbolScene
 
       const elapsed = (performance.now() - start) / 1000
 
+      // Track the panel position every frame so assembly works regardless of
+      // which element actually scrolls (window, body or a nested container).
+      readProgress()
+
       // inertia: ease progress and pointer toward their targets
-      progress += (targetProgress - progress) * 0.06
+      progress += (targetProgress - progress) * 0.08
       smoothPointer.x += (pointer.x - smoothPointer.x) * 0.05
       smoothPointer.y += (pointer.y - smoothPointer.y) * 0.05
 
