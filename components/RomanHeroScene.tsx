@@ -364,6 +364,7 @@ export default function RomanHeroScene({ className = "" }: { className?: string 
      * narrow ones they stay centred and simply shrink.
      */
     let layoutOffsetX = 0
+    let layoutOffsetY = 0
 
     const onResize = () => {
       if (!mount.clientWidth || !mount.clientHeight) return
@@ -371,10 +372,11 @@ export default function RomanHeroScene({ className = "" }: { className?: string 
       camera.updateProjectionMatrix()
       renderer.setSize(mount.clientWidth, mount.clientHeight)
       const width = mount.clientWidth
-      const scale = THREE.MathUtils.clamp(width / 1280, 0.52, 1)
+      const scale = THREE.MathUtils.clamp(width / 1280, 0.66, 1)
       heroLayer.scale.setScalar(scale)
       midLayer.scale.setScalar(scale)
       layoutOffsetX = width >= 1024 ? 2.6 : width >= 768 ? 1.6 : 0
+      layoutOffsetY = width < 768 ? 1.85 : 0
       readScrollProgress()
     }
 
@@ -416,14 +418,14 @@ export default function RomanHeroScene({ className = "" }: { className?: string 
       bgLayer.rotation.z = pointer.x * 0.02 + elapsed * 0.005
 
       midLayer.position.x = layoutOffsetX * 0.8 + pointer.x * 0.9
-      midLayer.position.y = -pointer.y * 0.6 + p * 1.1
+      midLayer.position.y = layoutOffsetY * 0.85 - pointer.y * 0.6 + p * 1.1
       midLayer.rotation.z = elapsed * 0.04 + p * 0.5
       rings.forEach((ring, index) => {
         ring.rotation.y = elapsed * (0.08 + index * 0.03) + p * (1 + index * 0.4)
       })
 
       heroLayer.position.x = layoutOffsetX + pointer.x * 1.5
-      heroLayer.position.y = -pointer.y * 1.0
+      heroLayer.position.y = layoutOffsetY - pointer.y * 1.0
       heroLayer.rotation.y = pointer.x * 0.32
       heroLayer.rotation.x = pointer.y * 0.2
 
@@ -479,7 +481,7 @@ export default function RomanHeroScene({ className = "" }: { className?: string 
           alt="Roman gladius and scutum shield"
           fill
           priority
-          className="object-contain opacity-90"
+          className="object-contain object-[center_22%] opacity-95 contrast-125 md:object-center"
         />
       </div>
     )

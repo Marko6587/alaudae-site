@@ -20,17 +20,17 @@ export default function Home() {
   return (
     <div className="bg-white text-black">
       {/* Hero with interactive 3D scene */}
-      <section className="relative flex min-h-[100svh] items-center overflow-hidden pb-28 pt-24">
+      <section className="relative flex min-h-[100svh] items-start overflow-hidden pb-20 pt-[30rem] md:items-center md:pb-28 md:pt-24">
         <RomanHeroScene className="pointer-events-none absolute inset-0 z-0" />
-        {/* Keeps type legible over the rendered metal */}
+        {/* On narrow screens the scene owns the upper stage; on desktop copy and object sit side by side. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10 bg-white/[0.78] md:bg-gradient-to-r md:from-white md:via-white/80 md:to-transparent"
+          className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-transparent via-white/10 via-[35%] to-white to-[55%] md:bg-gradient-to-r md:from-white md:via-white/75 md:to-transparent"
         />
 
         <div className="container relative z-20 mx-auto px-6">
           <div className="max-w-2xl text-center md:text-left animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-            <div className="mb-10 flex justify-center md:justify-start animate-in fade-in zoom-in-95 duration-700 delay-200 fill-mode-both">
+            <div className="mb-10 hidden justify-center md:flex md:justify-start animate-in fade-in zoom-in-95 duration-700 delay-200 fill-mode-both">
               <Image src="/logo.png" alt="Alaudae Secure Consulting" width={190} height={190} className="h-auto" />
             </div>
 
