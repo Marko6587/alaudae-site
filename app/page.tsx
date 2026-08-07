@@ -1,10 +1,17 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { formatPostDate, getBlog, getHome, getServices } from "@/lib/content"
+
+// Cinematic WebGL hero, client-only and off the critical path.
+const RomanLineCinematic = dynamic(() => import("@/components/RomanLineCinematic"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-black" aria-hidden="true" />,
+})
 
 export default function Home() {
   const { language } = useLanguage()
@@ -15,30 +22,45 @@ export default function Home() {
 
   return (
     <div className="bg-white text-black">
-      {/* Hero */}
-      <section className="relative flex min-h-[92svh] items-center overflow-hidden py-24">
-        <div className="container relative z-10 mx-auto px-6">
-          <div className="mx-auto max-w-3xl text-center animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-            <div className="mb-10 flex justify-center animate-in fade-in zoom-in-95 duration-700 delay-150 fill-mode-both">
-              <Image src="/logo.png" alt="Alaudae Secure Consulting" width={180} height={180} className="h-auto" priority />
+      {/* Cinematic black hero: a glowing bronze line draws a Roman scutum, then a gladius and crossed spears */}
+      <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden bg-black">
+        <RomanLineCinematic className="absolute inset-0 z-0" />
+
+        {/* legibility gradient over the lower portion */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent"
+        />
+
+        <div className="container relative z-20 mx-auto px-6 pb-16 md:pb-20">
+          <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-both">
+            <div className="mb-8 animate-in fade-in zoom-in-95 duration-1000 delay-200 fill-mode-both">
+              <Image
+                src="/logo.png"
+                alt="Alaudae Secure Consulting"
+                width={132}
+                height={132}
+                className="h-auto opacity-90 [filter:invert(1)]"
+                priority
+              />
             </div>
 
-            <p className="mb-6 text-xs uppercase tracking-[0.25em] text-gray-500">{copy.eyebrow}</p>
-            <h1 className="mb-8 text-3xl font-light leading-tight text-balance md:text-4xl lg:text-5xl">
+            <p className="mb-5 text-xs uppercase tracking-[0.3em] text-[#c8862f]">{copy.eyebrow}</p>
+            <h1 className="mb-6 text-3xl font-light leading-tight text-balance text-white md:text-4xl lg:text-5xl">
               {copy.headline}
             </h1>
-            <p className="mb-5 text-lg font-light text-gray-600 text-pretty">{copy.subtitle}</p>
-            <p className="mx-auto mb-12 max-w-xl text-base font-light text-gray-500 text-pretty">{copy.description}</p>
+            <p className="mb-4 max-w-xl text-lg font-light text-gray-300 text-pretty">{copy.subtitle}</p>
+            <p className="mb-10 max-w-xl text-base font-light text-gray-400 text-pretty">{copy.description}</p>
 
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="flex flex-col gap-4 sm:flex-row">
               <Link href="/services">
-                <button className="group flex items-center border border-black bg-black px-8 py-3 font-light text-white transition-colors duration-300 hover:bg-gray-900">
+                <button className="group flex items-center border border-white bg-white px-8 py-3 font-light text-black transition-colors duration-300 hover:bg-gray-200">
                   {copy.cta}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </Link>
               <Link href="/blog">
-                <button className="group flex items-center border border-gray-300 bg-white px-8 py-3 font-light text-black transition-colors duration-300 hover:border-black">
+                <button className="group flex items-center border border-white/30 bg-transparent px-8 py-3 font-light text-white transition-colors duration-300 hover:border-white">
                   {copy.insightsCta}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
