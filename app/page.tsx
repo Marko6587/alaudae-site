@@ -7,8 +7,8 @@ import { ArrowRight } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { formatPostDate, getBlog, getHome, getServices } from "@/lib/content"
 
-// Cinematic monochrome hero built from photoreal Roman weapon imagery.
-const RomanEmblemHero = dynamic(() => import("@/components/RomanEmblemHero"), {
+// Cinematic monochrome hero: a glowing line draws itself into a large Roman scutum.
+const RomanLineCinematic = dynamic(() => import("@/components/RomanLineCinematic"), {
   ssr: false,
   loading: () => <div className="absolute inset-0 bg-black" aria-hidden="true" />,
 })
@@ -22,21 +22,19 @@ export default function Home() {
 
   return (
     <div className="bg-white text-black">
-      {/* Cinematic black hero: a photoreal Roman scutum shield over two crossed gladii */}
-      <section className="relative min-h-[100svh] overflow-hidden bg-black">
-        {/* Emblem: full-bleed on mobile (behind copy), right side on desktop */}
-        <div className="absolute inset-0 z-0 md:left-[50%] md:right-[7%]">
-          <RomanEmblemHero className="absolute inset-0" />
-        </div>
+      {/* Cinematic black hero: a glowing line draws itself into a large Roman scutum */}
+      <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden bg-black">
+        {/* Full-bleed self-drawing shield animation */}
+        <RomanLineCinematic className="absolute inset-0 z-0" />
 
-        {/* legibility gradients: bottom-up on mobile, left-to-right on desktop */}
+        {/* legibility gradient over the lower portion for the copy */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black via-black/85 to-black/40 md:bg-gradient-to-r md:from-black md:via-black/85 md:to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent"
         />
 
-        <div className="container relative z-20 mx-auto flex min-h-[100svh] items-end px-6 pb-16 md:items-center md:pb-0">
-          <div className="max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-both">
+        <div className="container relative z-20 mx-auto px-6 pb-16 md:pb-20">
+          <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-both">
             <div className="mb-8 animate-in fade-in zoom-in-95 duration-1000 delay-200 fill-mode-both">
               <Image
                 src="/logo.png"
