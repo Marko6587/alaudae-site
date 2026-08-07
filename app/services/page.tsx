@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { useLanguage } from "@/context/language-context"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
@@ -487,24 +486,17 @@ export default function Services() {
   return (
     <div className="bg-white min-h-screen py-24">
       <div className="container mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-20"
-        >
+        <div className="text-center mb-20 animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
           <h1 className="text-3xl font-light mb-4">{serviceData.title}</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">{serviceData.description}</p>
-        </motion.div>
+        </div>
 
         <div className="space-y-24">
           {serviceData.services.map((service, index) => (
-            <motion.div
+            <div
               key={service.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
+              className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className={index % 2 === 0 ? "order-1" : "order-1 md:order-2"}>
                 <h2 className="text-2xl font-light mb-4">{service.title}</h2>
@@ -540,7 +532,7 @@ export default function Services() {
               >
                 <h3 className="text-5xl font-extralight text-gray-200">{service.title}</h3>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 

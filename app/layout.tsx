@@ -14,8 +14,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="bg-white">
+      <body className={`${inter.className} bg-white text-black`}>
         <LanguageProvider>
           <div className="flex flex-col min-h-screen">
             <Header />

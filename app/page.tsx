@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { useLanguage } from "@/context/language-context"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
@@ -211,21 +210,11 @@ export default function Home() {
       {/* Hero Section */}
       <section className="min-h-[90vh] flex items-center pt-20 pb-32">
         <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto"
-          >
+          <div className="text-center max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
             {/* Logo above the heading */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex justify-center mb-16"
-            >
+            <div className="flex justify-center mb-16 animate-in fade-in zoom-in-95 duration-700 delay-200 fill-mode-both">
               <Image src="/logo.png" alt="Alaudae Secure Consulting" width={270} height={270} className="h-auto" />
-            </motion.div>
+            </div>
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-tight mb-8">
               Investing in security today is preventing losses tomorrow
@@ -238,33 +227,27 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </button>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Services Section */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-20"
-          >
+          <div className="text-center mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
             <h2 className="text-2xl md:text-3xl font-light mb-4">{content.services.title}</h2>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
             {content.services.items.map((service, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 * (index + 1) }}
+                className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both"
+                style={{ animationDelay: `${100 * (index + 1)}ms` }}
               >
                 <h3 className="text-lg font-medium mb-3">{service.title}</h3>
                 <p className="text-gray-600 font-light">{service.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -273,12 +256,7 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-24">
         <div className="container mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl mx-auto"
-          >
+          <div className="max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
             <h2 className="text-2xl md:text-3xl font-light mb-6">{content.contact.title}</h2>
             <p className="text-base text-gray-600 mb-10 font-light">{content.contact.description}</p>
             <Link href="/contact">
@@ -287,7 +265,7 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </button>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

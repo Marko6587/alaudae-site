@@ -1,6 +1,5 @@
 "use client"
 import { useLanguage } from "@/context/language-context"
-import { motion } from "framer-motion"
 
 export default function About() {
   const { language } = useLanguage()
@@ -210,65 +209,44 @@ export default function About() {
   return (
     <div className="bg-white min-h-screen py-24">
       <div className="container mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-20"
-        >
+        <div className="text-center mb-20 animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
           <h1 className="text-3xl font-light mb-4">{content.title}</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">{content.description}</p>
-        </motion.div>
+        </div>
 
         {/* Mission Section */}
         <div className="max-w-3xl mx-auto mb-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center"
-          >
+          <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
             <h2 className="text-2xl font-light mb-6">{content.mission.title}</h2>
             <p className="text-gray-600 font-light">{content.mission.content}</p>
-          </motion.div>
+          </div>
         </div>
 
         {/* Values Section */}
         <div className="mb-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-12"
-          >
+          <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
             <h2 className="text-2xl font-light mb-4">{content.values.title}</h2>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {content.values.items.map((item, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <h3 className="text-lg font-medium mb-2">{item.title}</h3>
                 <p className="text-gray-600 font-light">{item.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
 
         {/* Team Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-3xl mx-auto"
-        >
+        <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
           <h2 className="text-2xl font-light mb-6 text-center">{content.team.title}</h2>
           <p className="text-gray-600 font-light text-center">{content.team.content}</p>
-        </motion.div>
+        </div>
       </div>
     </div>
   )

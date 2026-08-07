@@ -1,7 +1,6 @@
 "use client"
 import { useLanguage } from "@/context/language-context"
 import ProjectCard from "@/components/ProjectCard"
-import { motion } from "framer-motion"
 
 export default function Projects() {
   const { t, language } = useLanguage()
@@ -471,7 +470,7 @@ export default function Projects() {
                         ]
                       : [
                           "Снижение рисков штрафов и санкций от регуляторов",
-                          "Повышение доверия инвесторов, партнеров и клиентов",
+                          "Повышение доверия инвесторо��, партнеров и клиентов",
                           "Создание прозрачной и этичной корпоративной культуры",
                           "Защита от репутационных рисков и негативного PR",
                           "Повышение инвестиционной привлекательности компании",
@@ -590,7 +589,7 @@ export default function Projects() {
                   : language === "pl"
                     ? "🚀 Jak zaczyna się projekt?"
                     : language === "de"
-                      ? "🚀 Wie beginnt das Projekt?"
+                      ? "���� Wie beginnt das Projekt?"
                       : "🚀 Как начинается проект?",
             content:
               language === "uk"
@@ -751,7 +750,7 @@ export default function Projects() {
                 ? [
                     "Зниження ризиків втрат від зовнішніх та внутрішніх загроз",
                     "Підвищення рівня захищеності інтелектуальної власності та комерційної таємниці",
-                    "Створення надійної системи перевірки контрагентів та персоналу",
+                    "Створення надійної систе��и перевірки контрагентів та персоналу",
                     "Формування культури безпеки в компанії",
                     "Забезпечення безперервності бізнес-процесів в кризових ситуаціях",
                   ]
@@ -1311,7 +1310,7 @@ export default function Projects() {
                         ]
                       : [
                           "Повышение производительности труда на 20-40%",
-                          "Снижение операционных затрат на 15-30%",
+                          "Снижение опе��ационных затрат на 15-30%",
                           "Сокращение времени выполнения заказов на 30-50%",
                           "Повышение качества продукции и снижение количества дефектов",
                           "Оптимизация использования ресурсов и уменьшение отходов",
@@ -1684,23 +1683,17 @@ export default function Projects() {
   return (
     <div className="bg-white min-h-screen py-24">
       <div className="container mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-20"
-        >
+        <div className="text-center mb-20 animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
           <h1 className="text-3xl font-light mb-4">{projectData.title}</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">{projectData.description}</p>
-        </motion.div>
+        </div>
 
         <div className="max-w-3xl mx-auto">
           {projectData.projects.map((project, index) => (
-            <motion.div
+            <div
               key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               <ProjectCard
                 id={project.id}
@@ -1708,7 +1701,7 @@ export default function Projects() {
                 description={project.shortDescription}
                 sections={getProjectSections(project.id)}
               />
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
